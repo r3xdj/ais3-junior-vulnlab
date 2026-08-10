@@ -1,8 +1,57 @@
 services:
-
   apache:
     build:
       context: ./ingress
     container_name: ctf-apache
     ports:
       - "8080:80"
+  postgres:
+    build: ./datastores/postgres
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ./datastores/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - internal_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  web-gateway:
+    build: ./web-gateway
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - internal_net
+      - public_net
+
+  frontend:
+    build: ./frontend
+    environment:
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+    networks:
+      - public_net
+    depends_on:
+      - web-gateway
+
+networks:
+  public_net:
+    driver: bridge
+  internal_net:
+    internal: true
+
+volumes:
+  pgdata:

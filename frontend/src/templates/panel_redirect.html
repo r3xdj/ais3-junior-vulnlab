@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>載入中...</title>
+</head>
+<body>
+    <p>正在導向您的儀表板...</p>
+    <script src="{{ url_for('static', filename='js/config.js') }}"></script>
+    <script>
+        (async () => {
+            try {
+                const res = await fetch(apiUrl('/api/me'), { credentials: 'include' });
+                if (!res.ok) {
+                    window.location.href = '/login';
+                    return;
+                }
+                const data = await res.json();
+                window.location.href = (data.role === 'admin')
+                    ? '/admin/dashboard'
+                    : '/user/dashboard';
+            } catch (err) {
+                window.location.href = '/login';
+            }
+        })();
+    </script>
+</body>
+</html>

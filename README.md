@@ -47,3 +47,11 @@ ais3-complex-target-lab/
 | 資料庫 | PostgreSQL / MySQL | 儲存帳號與權限狀態，提供 SQL Injection 或憑證撈取點。 |
 | 快取 | Redis | 處理 Session 快取。若未設防護，可透過 SSRF 進行橫向移動或 Key 寫入。 |
 | 主機提權 | Linux（Bash Script / SUID） | 配置帶有漏洞的特權腳本（maintenance.sh），實現終極 Root Flag 提權。 |
+
+## 啟動
+
+```
+docker compose up -d --build
+```
+
+然後訪問 http://localhost:3000

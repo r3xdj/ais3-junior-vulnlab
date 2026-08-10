@@ -30,7 +30,11 @@ def register():
               + '"role": "' + "user" \
               + '", "username": "' + str(username) \
               + '"}'
-    payload = json.loads(body)
+
+    try:
+        payload = json.loads(body)
+    except json.JSONDecodeError:
+        return jsonify({"error": "Invalid username format"}), 400
 
     now = datetime.now(timezone.utc)
     payload['sub'] = user_id
@@ -70,6 +74,12 @@ def login():
     resp.set_cookie('session_token', token, httponly=True)
     return resp
 
+@auth_bp.route('/logout', methods=['POST'])
+def logout():
+    resp = jsonify({"message": "Logged out"})
+    resp.set_cookie('session_token', '', expires=0)
+    return resp
+
 @auth_bp.route('/me')
 @require_login
 def me():
@@ -77,9 +87,3 @@ def me():
         "username": g.user.get('username'),
         "role": g.user.get('role')
     })
-
-@auth_bp.route('/logout', methods=['POST'])
-def logout():
-    resp = jsonify({"message": "Logged out"})
-    resp.set_cookie('session_token', '', expires=0)
-    return resp

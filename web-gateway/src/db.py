@@ -24,9 +24,6 @@ def put_conn(conn):
 def close_pool():
     pool.closeall()
 
-
-# ---------- User 相關操作 ----------
-
 def get_user_by_username(username: str):
     conn = get_conn()
     try:
@@ -47,8 +44,8 @@ def create_user(username: str, password_hash: str):
     try:
         cur = conn.cursor()
         cur.execute(
-            "INSERT INTO users (username, password_hash, role) VALUES (%s, %s, %s) RETURNING id",
-            (username, password_hash, 'user')
+            "INSERT INTO users (username, password_hash) VALUES (%s, %s) RETURNING id",
+            (username, password_hash)
         )
         user_id = cur.fetchone()[0]
         conn.commit()
