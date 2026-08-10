@@ -1,5 +1,5 @@
 from flask import Flask, render_template
-from decorators import require_login_page, require_admin_page
+from decorators import require_login_page, require_admin_page, redirect_if_logged_in
 
 app = Flask(__name__)
 
@@ -26,10 +26,12 @@ def blog():
 
 # ---- 認證頁面(畫面殼,邏輯打 web-gateway 的 API)----
 @app.route('/login')
+@redirect_if_logged_in
 def login_page():
     return render_template('auth/login.html')
 
 @app.route('/register')
+@redirect_if_logged_in
 def register_page():
     return render_template('auth/register.html')
 

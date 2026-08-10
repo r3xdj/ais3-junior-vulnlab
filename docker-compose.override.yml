@@ -1,12 +1,4 @@
-# 還沒串 Apache 測試用
-
 services:
-  frontend:
-    ports:
-      - "3000:3000"
-  web-gateway:
-    ports:
-      - "5000:5000"
   postgres:
     ports:
-      - "5432:5432"   # 方便你用 DBeaver/psql 直接檢查資料
+      - "5432:5432"

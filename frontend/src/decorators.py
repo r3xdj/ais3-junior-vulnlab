@@ -26,3 +26,16 @@ def require_admin_page(f):
             return render_template('errors/403.html'), 403
         return f(*args, **kwargs)
     return wrapper
+
+def redirect_if_logged_in(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        token = request.cookies.get('session_token')
+        if token:
+            try:
+                jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+                return redirect('/panel')
+            except jwt.InvalidTokenError:
+                pass  # token 無效,當作未登入,繼續往下走
+        return f(*args, **kwargs)
+    return wrapper

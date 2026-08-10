@@ -5,6 +5,8 @@ services:
     container_name: ctf-apache
     ports:
       - "8080:80"
+    networks:
+      - public_net
   postgres:
     build: ./datastores/postgres
     environment:

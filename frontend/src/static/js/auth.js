@@ -1,15 +1,3 @@
-(async () => {
-    try {
-        const res = await fetch(apiUrl('/api/me'), { credentials: 'include' });
-        if (res.ok) {
-            window.location.href = '/panel';
-        }
-        // 401/其他狀況 → 什麼都不做,留在原頁面讓使用者登入/註冊
-    } catch (err) {
-        // 網路錯誤也留在原頁面,不影響正常使用
-    }
-})();
-
 document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const errorBox = document.getElementById('errorBox');
