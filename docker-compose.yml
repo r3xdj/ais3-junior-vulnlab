@@ -1,0 +1,8 @@
+services:
+
+  apache:
+    build:
+      context: ./ingress
+    container_name: ctf-apache
+    ports:
+      - "8080:80"
