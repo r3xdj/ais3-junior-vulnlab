@@ -2,3 +2,9 @@ services:
   postgres:
     ports:
       - "5432:5432"
+  redis:
+    ports:
+      - "6379:6379"   # 本地開發可以直接用 redis-cli 確認佇列狀態
+  celery-worker:
+    volumes:
+      - ./flags:/flags:ro

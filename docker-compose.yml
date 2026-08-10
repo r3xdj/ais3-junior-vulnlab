@@ -7,6 +7,10 @@ services:
       - "8080:80"
     networks:
       - public_net
+    depends_on:
+      - web-gateway
+      - frontend
+
   postgres:
     build: ./datastores/postgres
     environment:
@@ -24,6 +28,13 @@ services:
       timeout: 3s
       retries: 5
 
+  redis:
+    image: redis:7-alpine
+    # 刻意不設密碼,作為 Stage 3 SSRF 打進來後可直接操作的目標
+    networks:
+      - internal_net
+    # 絕對不對外暴露 port,選手必須靠 SSRF 才能碰到
+
   web-gateway:
     build: ./web-gateway
     environment:
@@ -33,6 +44,8 @@ services:
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     depends_on:
       postgres:
         condition: service_healthy
@@ -48,6 +61,18 @@ services:
       - public_net
     depends_on:
       - web-gateway
+
+  celery-worker:
+    build: ./celery-worker
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on:
+      - redis
+    networks:
+      - internal_net
+    volumes:
+      - ./flags:/flags:ro   # flags 掛進來,但權限在 Dockerfile 裡控制
 
 networks:
   public_net:

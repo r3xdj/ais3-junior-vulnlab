@@ -1,13 +1,16 @@
 import atexit
 from flask import Flask
-from flask_cors import CORS
 
 from routes.auth import auth_bp
+from routes.admin import register_admin_blueprints
+from routes.user import register_user_blueprints
 from db import close_pool
 
 def create_app():
     app = Flask(__name__)
     app.register_blueprint(auth_bp)
+    register_admin_blueprints(app)
+    register_user_blueprints(app)
     return app
 
 app = create_app()
