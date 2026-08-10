@@ -5,7 +5,7 @@ COPY httpd.conf /usr/local/apache2/conf/httpd.conf
 COPY conf.d/ /usr/local/apache2/conf/conf.d/
 
 COPY html/ /usr/local/apache2/htdocs/
-COPY cve-secret/ /usr/local/apache2/cve-secret/
+
 
 RUN sed -i '1c #!/bin/sh' /usr/local/apache2/cgi-bin/test-cgi \
     && chmod +x /usr/local/apache2/cgi-bin/test-cgi
