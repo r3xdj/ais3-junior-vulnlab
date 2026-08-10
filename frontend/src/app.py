@@ -1,4 +1,5 @@
 from flask import Flask, render_template
+from decorators import require_login_page, require_admin_page
 
 app = Flask(__name__)
 
@@ -37,35 +38,44 @@ def register_page():
 def panel():
     return render_template('user/panel_redirect.html')  # 頁面內 JS 打 /api/me 決定導去哪
 
-# ---- User 頁面殼 ----
-@app.route('/user/dashboard')
-def user_dashboard():
-    return render_template('user/dashboard.html')
-
-@app.route('/user/profile')
-def user_profile():
-    return render_template('user/profile.html')
-
-@app.route('/user/activity')
-def user_activity():
-    return render_template('user/activity.html')
-
-@app.route('/user/change-password')
-def user_password():
-    return render_template('user/password.html')
+from decorators import require_login_page, require_admin_page
 
 # ---- Admin 頁面殼 ----
 @app.route('/admin/dashboard')
+@require_admin_page
 def admin_dashboard():
     return render_template('admin/dashboard.html')
 
 @app.route('/admin/reports')
+@require_admin_page
 def admin_reports():
     return render_template('admin/reports.html')
 
-@app.route('/admin/users')
+@app.route('/admin/manage-users')
+@require_admin_page
 def admin_users():
     return render_template('admin/users.html')
+
+# ---- User 頁面殼,一般登入即可(admin 也能用,前面討論過)----
+@app.route('/user/dashboard')
+@require_login_page
+def user_dashboard():
+    return render_template('user/dashboard.html')
+
+@app.route('/user/profile')
+@require_login_page
+def user_profile():
+    return render_template('user/profile.html')
+
+@app.route('/user/activity')
+@require_login_page
+def user_activity():
+    return render_template('user/activity.html')
+
+@app.route('/user/change-password')
+@require_login_page
+def user_password():
+    return render_template('user/password.html')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=3000)
