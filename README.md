@@ -54,4 +54,4 @@ ais3-complex-target-lab/
 docker compose up -d --build
 ```
 
-然後訪問 http://localhost:3000
+然後訪問 http://localhost:8080
