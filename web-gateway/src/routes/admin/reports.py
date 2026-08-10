@@ -1,5 +1,5 @@
 from flask import Blueprint
 
-reports_bp = Blueprint('reports', __name__, url_prefix='/admin')
+reports_bp = Blueprint('reports', __name__, url_prefix='/api/admin')
 
-# TODO: /admin/fetch-report
+# TODO: /api/admin/fetch-report

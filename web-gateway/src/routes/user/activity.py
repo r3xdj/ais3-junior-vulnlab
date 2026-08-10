@@ -1,5 +1,5 @@
 from flask import Blueprint
 
-activity_bp = Blueprint('activity', __name__, url_prefix='/user')
+activity_bp = Blueprint('activity', __name__, url_prefix='/api/user')
 
-# TODO: /user/view-activity
+# TODO: /api/user/view-activity
