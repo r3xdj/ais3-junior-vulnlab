@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>關於 AIS3與榮譽考試 - AIS3 Student Portal</title>
+    <!-- 引入 Bootstrap 5 CSS 與 Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+<body class="bg-light">
+
+    <!-- 頂部導覽列 -->
+    {% include "public/_navbar.html" %}
+
+    <!-- 主視覺 Banner -->
+    <header class="bg-dark text-white py-5 border-bottom border-primary border-4">
+        <div class="container text-center my-3">
+            <h1 class="display-5 fw-bold">關於 AIS3 培訓計畫與榮譽考試</h1>
+            <p class="lead text-muted">結合產業資安需求，打造具攻防實務力之資安高階人才</p>
+        </div>
+    </header>
+
+    <div class="container py-5">
+        <div class="row g-4">
+            <!-- 左側：AIS3 培訓計畫簡介 -->
+            <div class="col-lg-7">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body p-4">
+                        <h3 class="card-title fw-bold text-primary mb-3">
+                            <i class="bi bi-award-fill me-2"></i>AIS3 計畫簡介
+                        </h3>
+                        <p class="card-text lh-lg">
+                            為提昇學生的資訊安全實務能力，培養具攻防實務力之進階人才，AIS3 於每年暑假七月底舉辦為期 7 天的密集課程。
+                            訓練邀請國際講師、國內專家學者辦理以產業專題導向之資安暑期課程，內容強調與產業連結，以產業資安需求為導向，引導學生小組製作與展示專題成果並搭配近期資安趨勢議題設計課程內容。
+                        </p>
+                        <p class="card-text lh-lg">
+                            學員事先進行篩選：透過繳交推薦甄選資料或需通過 Jeopardy CTF 類型 pre-exam 後才能參與，並依學員興趣主題組成跨校跨級專案小組，最後兩日以分組專題競賽形式進行，發表專題報告。
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 榮譽考試特色 -->
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h3 class="card-title fw-bold text-success mb-3">
+                            <i class="bi bi-check-circle-fill me-2"></i>AIS3 榮譽考試機制
+                        </h3>
+                        <p class="card-text lh-lg">
+                            「AIS3 榮譽考試」是專為評測實戰能力所設計的線上檢定，開放給所有對資安攻防有興趣的在籍學生報名。試題涵蓋 Web 滲透測試、微服務與 API 安全、以及系統權限提升等核心技術。
+                        </p>
+                        <ul class="list-group list-group-flush mb-3">
+                            <li class="list-group-item bg-transparent"><i class="bi bi-shield-check text-success me-2"></i><strong>免除初審：</strong> 通過檢定即可直升 7 天資安暑期營隊。</li>
+                            <li class="list-group-item bg-transparent"><i class="bi bi-file-earmark-pdf text-success me-2"></i><strong>自動證書頒發：</strong> 通過者由背景系統自動產出附雷達圖之榮譽證書。</li>
+                            <li class="list-group-item bg-transparent"><i class="bi bi-people text-success me-2"></i><strong>優先組隊：</strong> 享有專題競賽優先選組與導師媒合權利。</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右側：側邊欄與行動呼籲 -->
+            <div class="col-lg-5">
+                <div class="card border-primary shadow-sm mb-4">
+                    <div class="card-body p-4 text-center">
+                        <h4 class="fw-bold mb-3">準備好挑戰自我了嗎？</h4>
+                        <p class="text-muted">立即註冊帳號並報名本次「AIS3 榮譽考試」，驗證你的資安實務能力！</p>
+                        <a href="/register" class="btn btn-primary btn-lg w-100 mb-2">立即報名考試</a>
+                        <!-- 連至首頁按鈕 -->
+                        <a href="/" class="btn btn-outline-secondary w-100">← 返回 Portal 首頁</a>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-info-circle me-2"></i>考核範疇與技術重點</h5>
+                        <div class="badge bg-secondary mb-2 p-2">Web / API 滲透</div>
+                        <div class="badge bg-secondary mb-2 p-2">JSON / JWT 身分驗證</div>
+                        <div class="badge bg-secondary mb-2 p-2">SSRF & 內網橫向移動</div>
+                        <div class="badge bg-secondary mb-2 p-2">Linux Privilege Escalation</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 頁尾 -->
+    {% include "public/_footer.html" %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

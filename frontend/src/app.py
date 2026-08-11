@@ -8,32 +8,20 @@ app = Flask(__name__)
 def index():
     return render_template('public/index.html')
 
-@app.route('/product')
-def product():
-    return render_template('public/product.html')
-
 @app.route('/about')
 def about():
     return render_template('public/about.html')
-
-@app.route('/careers')
-def careers():
-    return render_template('public/careers.html')
-
-@app.route('/blog')
-def blog():
-    return render_template('public/blog.html')
 
 # ---- 認證頁面(畫面殼,邏輯打 web-gateway 的 API)----
 @app.route('/login')
 @redirect_if_logged_in
 def login_page():
-    return render_template('auth/login.html')
+    return render_template('public/login.html')
 
 @app.route('/register')
 @redirect_if_logged_in
 def register_page():
-    return render_template('auth/register.html')
+    return render_template('public/register.html')
 
 # ---- 登入後導流(前端路由層,只影響 UX,不是安全邊界)----
 @app.route('/panel')

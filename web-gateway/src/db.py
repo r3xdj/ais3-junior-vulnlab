@@ -69,7 +69,7 @@ def get_user_by_id(user_id: int):
     try:
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         cur.execute(
-            "SELECT id, username, password_hash, role, email, display_name, created_at FROM users WHERE id = %s",
+            "SELECT id, username, password_hash, role, email, display_name, exam_type, created_at FROM users WHERE id = %s",
             (user_id,)
         )
         row = cur.fetchone()
@@ -89,17 +89,18 @@ def get_user_profile_by_id(user_id: int):
         "role": user["role"],
         "email": user["email"],
         "display_name": user["display_name"],
+        "exam_type": user["exam_type"],
         "created_at": user["created_at"],
     }
 
 
-def create_user(username: str, password_hash: str):
+def create_user(username: str, password_hash: str, email: str = None, exam_type: str = None):
     conn = get_conn()
     try:
         cur = conn.cursor()
         cur.execute(
-            "INSERT INTO users (username, password_hash) VALUES (%s, %s) RETURNING id",
-            (username, password_hash)
+            "INSERT INTO users (username, password_hash, email, exam_type) VALUES (%s, %s, %s, %s) RETURNING id",
+            (username, password_hash, email, exam_type)
         )
         user_id = cur.fetchone()[0]
         conn.commit()

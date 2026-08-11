@@ -13,18 +13,24 @@ from decorators import require_login
 auth_bp = Blueprint('auth', __name__, url_prefix='/api')
 SECRET_KEY = os.environ["JWT_SECRET_KEY"]
 
+EXAM_TYPES = {'web', 'pwn', 'crypto'}
+
 @auth_bp.route('/register', methods=['POST'])
 def register():
     username = request.form.get('username', '').strip()
     password = request.form.get('password', '')
+    email = request.form.get('email', '').strip() or None
+    exam_type = request.form.get('exam_type', '').strip() or None
 
     if not username or not password: return jsonify({"error": "Missing fields"}), 400
+    if exam_type is not None and exam_type not in EXAM_TYPES:
+        return jsonify({"error": "Invalid exam_type"}), 400
     if db.get_user_by_username(username) is not None: return jsonify({"error": "Username already exists"}), 409
 
     hashed_pw = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
     try:
-        user_id = db.create_user(username, hashed_pw)
+        user_id = db.create_user(username, hashed_pw, email, exam_type)
     except pg_errors.UniqueViolation:
         return jsonify({"error": "Username already exists"}), 409
 

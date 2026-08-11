@@ -1,0 +1,21 @@
+<!-- 頂部導覽列（共用元件，四個公開頁面統一從這裡引入，避免各頁風格各改各的） -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/">
+            <i class="bi bi-shield-lock-fill text-primary me-2"></i>AIS3 Student Portal
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item"><a class="nav-link {{ 'active' if request.path == '/' else '' }}" href="/">首頁</a></li>
+                <li class="nav-item"><a class="nav-link {{ 'active' if request.path == '/about' else '' }}" href="/about">關於 AIS3</a></li>
+                <li class="nav-item"><a class="nav-link {{ 'active' if request.path == '/login' else '' }}" href="/login">學員登入</a></li>
+                <li class="nav-item ms-2">
+                    <a class="btn btn-primary text-white px-3" href="/register">報名榮譽考試</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

@@ -1,3 +1,9 @@
+const EXAM_TYPE_LABELS = {
+    web: 'Web 安全與滲透測試組',
+    pwn: '二進位系統安全 (Pwn) 組',
+    crypto: '密碼學與資安應用組'
+};
+
 async function loadProfile() {
     const emailInput = document.getElementById('email');
     const nameInput = document.getElementById('display_name');
@@ -8,6 +14,11 @@ async function loadProfile() {
     const user = await res.json();
     emailInput.value = user.email || '';
     nameInput.value = user.display_name || '';
+
+    const examTypeInput = document.getElementById('exam_type');
+    if (examTypeInput) {
+        examTypeInput.value = user.exam_type ? (EXAM_TYPE_LABELS[user.exam_type] || user.exam_type) : '未設定';
+    }
 }
 
 document.getElementById('profileForm')?.addEventListener('submit', async (e) => {
