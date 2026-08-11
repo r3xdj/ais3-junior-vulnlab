@@ -8,6 +8,23 @@ pool = None
 pool_error = None
 
 
+def _migrate_users_table(conn_pool):
+    """Apply additive migrations needed by deployments with an existing DB volume."""
+    conn = conn_pool.getconn()
+    try:
+        cur = conn.cursor()
+        try:
+            cur.execute('ALTER TABLE users ADD COLUMN IF NOT EXISTS exam_type VARCHAR(20)')
+            conn.commit()
+        finally:
+            cur.close()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn_pool.putconn(conn)
+
+
 def _init_pool():
     global pool, pool_error
     if pool is not None:
@@ -23,6 +40,7 @@ def _init_pool():
             user=os.environ.get('DB_USER', 'app_user'),
             password=os.environ.get('DB_PASSWORD')
         )
+        _migrate_users_table(pool)
     except Exception as exc:
         pool_error = exc
         pool = None
