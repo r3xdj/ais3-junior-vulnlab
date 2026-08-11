@@ -13,18 +13,9 @@ COPY src/ .
 # 建立一般使用者,Celery Worker 以此身份執行(Stage 4 拿到的 shell 是這個權限)
 RUN useradd -m -u 1000 celeryuser
 
-# Stage 4: user flag,celeryuser 可讀
-RUN mkdir -p /home/celeryuser && \
-    cp /flags/user_flag.txt /home/celeryuser/user_flag.txt 2>/dev/null || \
-    echo "AIS3{placeholder_user_flag}" > /home/celeryuser/user_flag.txt && \
-    chown celeryuser:celeryuser /home/celeryuser/user_flag.txt && \
-    chmod 644 /home/celeryuser/user_flag.txt
-
-# Stage 5: root flag,只有 root 能讀
-RUN mkdir -p /root && \
-    cp /flags/root_flag.txt /root/root_flag.txt 2>/dev/null || \
-    echo "AIS3{placeholder_root_flag}" > /root/root_flag.txt && \
-    chmod 600 /root/root_flag.txt
+# Stage 4: 由 entrypoint 在啟動時從掛載的 /flags 複製 flag
+RUN mkdir -p /home/celeryuser /root && \
+    chown celeryuser:celeryuser /home/celeryuser
 
 # Stage 5: 建立 world-writable 的 log 目錄,選手可以在這裡放惡意檔案
 RUN mkdir -p /var/log/app /var/backups && \
@@ -41,7 +32,8 @@ RUN chmod 0644 /etc/cron.d/ais3-backup && \
     crontab /etc/cron.d/ais3-backup
 
 COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+RUN sed -i 's/\r//' /entrypoint.sh \
+    && chmod +x /entrypoint.sh
 
 EXPOSE 0
 

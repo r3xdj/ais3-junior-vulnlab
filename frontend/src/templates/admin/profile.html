@@ -1,4 +1,11 @@
 {% extends "base_app.html" %}
+{% block title %}Profile{% endblock %}
+{% block admin_tabs %}
+{% set current_path = request.path.rstrip('/') %}
+<a href="/admin/dashboard" class="nav-link {{ 'active fw-bold' if current_path == '/admin/dashboard' else '' }}">Dashboard</a>
+<a href="/admin/reports" class="nav-link {{ 'active fw-bold' if current_path == '/admin/reports' else '' }}">Reports</a>
+<a href="/admin/manage-users" class="nav-link {{ 'active fw-bold' if current_path == '/admin/manage-users' else '' }}">Users</a>
+{% endblock %}
 {% block content %}
 <div class="card shadow-sm">
     <div class="card-body">

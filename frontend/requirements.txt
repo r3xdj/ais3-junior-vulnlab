@@ -1,2 +1,3 @@
 Flask==3.0.3
 PyJWT==2.9.0
+# Frontend pages rely on Flask templates and JWT-based session handling.

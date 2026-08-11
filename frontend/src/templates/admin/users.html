@@ -1,0 +1,32 @@
+{% extends "base_app.html" %}
+{% block title %}User Management{% endblock %}
+{% block admin_tabs %}
+{% set current_path = request.path.rstrip('/') %}
+<a href="/admin/dashboard" class="nav-link {{ 'active fw-bold' if current_path == '/admin/dashboard' else '' }}">Dashboard</a>
+<a href="/admin/reports" class="nav-link {{ 'active fw-bold' if current_path == '/admin/reports' else '' }}">Reports</a>
+<a href="/admin/manage-users" class="nav-link {{ 'active fw-bold' if current_path == '/admin/manage-users' else '' }}">Users</a>
+{% endblock %}
+{% block content %}
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h2 class="mb-1">User Management</h2>
+        <p class="text-muted">可以查看與變更使用者權限</p>
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Email</th>
+                    <th>Created</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="usersTableBody"></tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}

@@ -1,25 +1,43 @@
-<!DOCTYPE html>
-<html lang="zh-Hant">
-<head>
-    <meta charset="UTF-8">
-    <title>User Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <nav class="navbar navbar-light bg-white shadow-sm px-4">
-        <a class="navbar-brand fw-bold" href="/panel">NovaCore</a>
-        <div class="ms-auto d-flex align-items-center gap-3">
-            <span class="text-muted small" id="usernameLabel"></span>
-            <button id="logoutBtn" class="btn btn-sm btn-outline-danger">登出</button>
-        </div>
-    </nav>
-    <div class="container py-4">
-        <h2>User Dashboard</h2>
-        <p>歡迎回來，這裡之後會放 Profile / Activity / Password 功能。</p>
+{% extends "base_app.html" %}
+{% block title %}User Dashboard{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-1">User Dashboard</h2>
+        <p class="text-muted mb-0">管理你的個人資料、活動紀錄與密碼</p>
     </div>
+</div>
 
-    <script src="{{ url_for('static', filename='js/config.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
-</body>
-</html>
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title">Profile</h5>
+                <p class="text-muted">更新信箱與顯示名稱</p>
+                <a href="/user/profile" class="btn btn-outline-primary">前往</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title">Activity</h5>
+                <p class="text-muted">查看最近的帳號活動</p>
+                <a href="/user/activity" class="btn btn-outline-primary">前往</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title">Change Password</h5>
+                <p class="text-muted">更新密碼並重新登入</p>
+                <a href="/user/change-password" class="btn btn-outline-primary">前往</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/user.js') }}"></script>
+{% endblock %}

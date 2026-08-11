@@ -58,6 +58,21 @@ def admin_reports():
 def admin_users():
     return render_template('admin/users.html')
 
+@app.route('/admin/profile')
+@require_admin_page
+def admin_profile():
+    return render_template('admin/profile.html')
+
+@app.route('/admin/activity')
+@require_admin_page
+def admin_activity():
+    return render_template('admin/activity.html')
+
+@app.route('/admin/change-password')
+@require_admin_page
+def admin_password():
+    return render_template('admin/password.html')
+
 # ---- User 頁面殼,一般登入即可(admin 也能用,前面討論過)----
 @app.route('/user/dashboard')
 @require_login_page

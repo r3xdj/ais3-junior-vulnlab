@@ -11,11 +11,22 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm px-4">
         <a class="navbar-brand fw-bold" href="/panel">NovaCore</a>
 
+        {% set is_admin_view = request.path.startswith('/admin/') %}
+        {% set current_path = request.path.rstrip('/') %}
         <div class="navbar-nav">
             {% block admin_tabs %}{% endblock %}
-            <a href="/user/profile" class="nav-link {{ 'active fw-bold' if active_tab == 'profile' }}">Profile</a>
-            <a href="/user/activity" class="nav-link {{ 'active fw-bold' if active_tab == 'activity' }}">Activity</a>
-            <a href="/user/change-password" class="nav-link {{ 'active fw-bold' if active_tab == 'password' }}">Password</a>
+            <a href="{{ '/admin/profile' if is_admin_view else '/user/profile' }}"
+               class="nav-link {{ 'active fw-bold' if current_path == ('/admin/profile' if is_admin_view else '/user/profile') else '' }}">
+                Profile
+            </a>
+            <a href="{{ '/admin/activity' if is_admin_view else '/user/activity' }}"
+               class="nav-link {{ 'active fw-bold' if current_path == ('/admin/activity' if is_admin_view else '/user/activity') else '' }}">
+                Activity
+            </a>
+            <a href="{{ '/admin/change-password' if is_admin_view else '/user/change-password' }}"
+               class="nav-link {{ 'active fw-bold' if current_path == ('/admin/change-password' if is_admin_view else '/user/change-password') else '' }}">
+                Password
+            </a>
         </div>
 
         <div class="ms-auto d-flex align-items-center gap-3">

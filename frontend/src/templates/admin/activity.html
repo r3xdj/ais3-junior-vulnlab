@@ -1,0 +1,20 @@
+{% extends "base_app.html" %}
+{% block title %}Activity{% endblock %}
+{% block admin_tabs %}
+{% set current_path = request.path.rstrip('/') %}
+<a href="/admin/dashboard" class="nav-link {{ 'active fw-bold' if current_path == '/admin/dashboard' else '' }}">Dashboard</a>
+<a href="/admin/reports" class="nav-link {{ 'active fw-bold' if current_path == '/admin/reports' else '' }}">Reports</a>
+<a href="/admin/manage-users" class="nav-link {{ 'active fw-bold' if current_path == '/admin/manage-users' else '' }}">Users</a>
+{% endblock %}
+{% block content %}
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h2 class="mb-1">Activity</h2>
+        <p class="text-muted">查看最近的帳號活動紀錄</p>
+        <ul id="activityList" class="list-group"></ul>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/user.js') }}"></script>
+{% endblock %}

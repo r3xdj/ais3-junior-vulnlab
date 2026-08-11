@@ -1,10 +1,13 @@
-// ---------- Profile 頁 ----------
 async function loadProfile() {
+    const emailInput = document.getElementById('email');
+    const nameInput = document.getElementById('display_name');
+    if (!emailInput || !nameInput) return;
+
     const res = await fetch(apiUrl('/api/user/profile'), { credentials: 'include' });
     if (!res.ok) { window.location.href = '/login'; return; }
     const user = await res.json();
-    document.getElementById('email').value = user.email || '';
-    document.getElementById('display_name').value = user.display_name || '';
+    emailInput.value = user.email || '';
+    nameInput.value = user.display_name || '';
 }
 
 document.getElementById('profileForm')?.addEventListener('submit', async (e) => {
@@ -21,12 +24,9 @@ document.getElementById('profileForm')?.addEventListener('submit', async (e) => 
     });
     const data = await res.json();
     if (msgBox) msgBox.textContent = res.ok ? '已儲存' : (data.error || '更新失敗');
+    if (res.ok) await loadProfile();
 });
 
-if (document.getElementById('profileForm')) loadProfile();
-
-
-// ---------- Activity 頁 ----------
 async function loadActivity() {
     const list = document.getElementById('activityList');
     if (!list) return;
@@ -42,10 +42,12 @@ async function loadActivity() {
               </li>`).join('')
         : '<li class="list-group-item text-muted">尚無活動紀錄</li>';
 }
-loadActivity();
 
+window.addEventListener('DOMContentLoaded', async () => {
+    if (document.getElementById('profileForm')) await loadProfile();
+    if (document.getElementById('activityList')) await loadActivity();
+});
 
-// ---------- Change Password 頁 ----------
 document.getElementById('passwordForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const msgBox = document.getElementById('msgBox');
@@ -69,5 +71,9 @@ document.getElementById('passwordForm')?.addEventListener('submit', async (e) =>
     });
     const data = await res.json();
     if (msgBox) msgBox.textContent = res.ok ? '密碼已更新，請重新登入' : (data.error || '更新失敗');
-    if (res.ok) setTimeout(() => { window.location.href = '/login'; }, 1500);
+    if (res.ok) {
+        e.target.reset();
+        await fetch(apiUrl('/api/logout'), { method: 'POST', credentials: 'include' });
+        setTimeout(() => { window.location.href = '/login'; }, 1500);
+    }
 });

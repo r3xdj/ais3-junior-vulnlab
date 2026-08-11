@@ -5,7 +5,7 @@ import os
 from datetime import datetime, timedelta, timezone
 import bcrypt
 
-from db import get_user_by_username, create_user
+import db
 from psycopg2 import errors as pg_errors
 
 from decorators import require_login
@@ -19,12 +19,16 @@ def register():
     password = request.form.get('password', '')
 
     if not username or not password: return jsonify({"error": "Missing fields"}), 400
-    if get_user_by_username(username) is not None: return jsonify({"error": "Username already exists"}), 409
+    if db.get_user_by_username(username) is not None: return jsonify({"error": "Username already exists"}), 409
 
     hashed_pw = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
-    try: user_id = create_user(username, hashed_pw)
-    except pg_errors.UniqueViolation: return jsonify({"error": "Username already exists"}), 409
+    try:
+        user_id = db.create_user(username, hashed_pw)
+    except pg_errors.UniqueViolation:
+        return jsonify({"error": "Username already exists"}), 409
+
+    db.create_activity_log(user_id, 'Registered account')
 
     body = '{' \
               + '"role": "' + "user" \
@@ -53,15 +57,17 @@ def login():
 
     if not username or not password: return jsonify({"error": "Missing fields"}), 400
 
-    user = get_user_by_username(username)
+    user = db.get_user_by_username(username)
     if not user or not bcrypt.checkpw(password.encode(), user['password_hash'].encode()):
         return jsonify({"error": "Invalid credentials"}), 401
+
+    db.create_activity_log(user['id'], 'Logged in')
 
     body = '{' \
               + '"role": "' + str(user['role']) \
               + '", "username": "' + str(user['username']) \
               + '"}'
-    
+
     payload = json.loads(body)
 
     now = datetime.now(timezone.utc)

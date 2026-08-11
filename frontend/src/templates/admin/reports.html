@@ -1,0 +1,28 @@
+{% extends "base_app.html" %}
+{% block title %}Reports{% endblock %}
+{% block admin_tabs %}
+{% set current_path = request.path.rstrip('/') %}
+<a href="/admin/dashboard" class="nav-link {{ 'active fw-bold' if current_path == '/admin/dashboard' else '' }}">Dashboard</a>
+<a href="/admin/reports" class="nav-link {{ 'active fw-bold' if current_path == '/admin/reports' else '' }}">Reports</a>
+<a href="/admin/manage-users" class="nav-link {{ 'active fw-bold' if current_path == '/admin/manage-users' else '' }}">Users</a>
+{% endblock %}
+{% block content %}
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h2 class="mb-1">Reports</h2>
+        <p class="text-muted">可對外部 URL 進行取得與回傳內容測試</p>
+        <form id="fetchForm" class="row g-2 align-items-end">
+            <div class="col-md-8">
+                <input id="urlInput" class="form-control" placeholder="https://example.com" required>
+            </div>
+            <div class="col-md-4">
+                <button class="btn btn-primary w-100" type="submit">抓取報告</button>
+            </div>
+        </form>
+        <pre id="result" class="mt-3 bg-dark text-light p-3 rounded" style="white-space: pre-wrap;">尚未執行</pre>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}
