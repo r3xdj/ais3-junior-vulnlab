@@ -1,5 +1,0 @@
-Web Security Basic Material
-
-This is web01.pdf.
-
-Welcome to the Web Security training area.
