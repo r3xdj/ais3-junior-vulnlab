@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>頂尖助教團隊 - AIS3 Student Portal</title>
+    <!-- 引入 Bootstrap 5 CSS 與 Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+<body class="bg-light">
+
+    <!-- 頂部導覽列 -->
+    {% include "public/_navbar.html" %}
+
+    <!-- 主視覺 Header -->
+    <header class="bg-dark text-white py-5 border-bottom border-primary border-4">
+        <div class="container text-center my-3">
+            <h1 class="display-5 fw-bold"><i class="bi bi-mortarboard-fill text-primary me-2"></i>頂尖助教團隊</h1>
+            <p class="lead text-muted">邀集產官學研與資安社群頂尖高手，親自引導學員進行實戰攻防與專題開發</p>
+        </div>
+    </header>
+
+    <!-- 助教列表區塊 -->
+    <div class="container py-5">
+        <div class="row g-4 justify-content-center">
+
+            <!-- 助教 1: xiunG -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 shadow-sm border-0 p-3">
+                    <div class="card-body">
+                        <h2 class="card-title fw-bold text-center mb-1">xiunG</h2>
+                        <p class="text-primary fw-bold text-center mb-3"><i class="bi bi-lightning-charge-fill me-1"></i>北電神 / 實戰導師</p>
+                        
+                        <div class="bg-light p-3 rounded mb-3">
+                            <p class="small text-muted mb-2">
+                                🎓 <strong>背景：</strong> 國立陽明交通大學資訊工程學系準大學生
+                            </p>
+                            <p class="small text-muted mb-0">
+                                🏆 <strong>殊榮：</strong> 台北數位實驗高中時期，跨級帶領大學生團隊勇奪全國「青年永續社會設計挑戰賽」第一名。
+                            </p>
+                        </div>
+
+                        <p class="card-text text-muted lh-lg">
+                            在同儕與資安社群中被廣為尊稱為「北電神」。憑藉極為出眾的邏輯思維與實作能力，在同齡同儕間被公認為實力強悍的頂尖學霸，具備跨級帶領大專團隊突破複雜專題的優異領導力與實戰技術。
+                        </p>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 pt-0 text-center">
+                        <span class="badge bg-secondary">陽明交大資工</span>
+                        <span class="badge bg-secondary">邏輯思維</span>
+                        <span class="badge bg-secondary">團隊領導</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 助教 2: solarfish -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 shadow-sm border-0 p-3">
+                    <div class="card-body">
+                        <h2 class="card-title fw-bold text-center mb-1">solarfish</h2>
+                        <p class="text-info fw-bold text-center mb-3"><i class="bi bi-shield-check me-1"></i>Web 安全與 CTF 專家</p>
+                        
+                        <div class="bg-light p-3 rounded mb-3">
+                            <p class="small text-muted mb-2">
+                                🔍 <strong>專長：</strong> Web 滲透測試、漏洞分析、微服務安全
+                            </p>
+                            <p class="small text-muted mb-0">
+                                🎯 <strong>特質：</strong> 深入淺出解析漏洞成因，擅長資安觀念建構
+                            </p>
+                        </div>
+
+                        <p class="card-text text-muted lh-lg">
+                            深耕 Web 安全與 CTF 解題領域，具備豐富的系統漏洞挖掘與研發經驗。善於將複雜的滲透測試觀念與漏洞利用鏈（Exploit Chain）拆解為易於理解的模組，協助學員建構全方位的 Web 防禦與檢測能力。
+                        </p>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 pt-0 text-center">
+                        <span class="badge bg-secondary">Web Security</span>
+                        <span class="badge bg-secondary">CTF 競賽</span>
+                        <span class="badge bg-secondary">漏洞挖掘</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 助教 3: 1Ping -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 shadow-sm border-0 p-3">
+                    <div class="card-body">
+                        <h2 class="card-title fw-bold text-center mb-1">1Ping</h2>
+                        <p class="text-dark fw-bold text-center mb-3"><i class="bi bi-cpu me-1"></i>系統攻防與社群導師</p>
+                        
+                        <div class="bg-light p-3 rounded mb-3">
+                            <p class="small text-muted mb-2">
+                                🛠️ <strong>專長：</strong> 系統安全、逆向工程、內網橫向移動
+                            </p>
+                            <p class="small text-muted mb-0">
+                                💡 <strong>特質：</strong> 實作導向教學，耐心地引導學生排解專題難題
+                            </p>
+                        </div>
+
+                        <p class="card-text text-muted lh-lg">
+                            長期活躍於資安技術社群，專精於系統攻防實務與逆向工程技術。對資安教育充滿熱忱，能精準指導學員在實戰靶機測試與專題製作過程中的疑難雜症，引導學員培養扎實的黑客思維與除錯能力。 除此之外，也熱衷於街頭藝人。
+                        </p>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 pt-0 text-center">
+                        <span class="badge bg-secondary">System Security</span>
+                        <span class="badge bg-secondary">Reverse Engineering</span>
+                        <span class="badge bg-secondary">攻防實務</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 導師互動區塊 -->
+        <div class="card bg-white border-0 shadow-sm mt-5">
+            <div class="card-body p-4 text-center">
+                <h4 class="fw-bold mb-2"><i class="bi bi-people-fill text-primary me-2"></i>想接受頂尖助教群的親戰指導嗎？</h4>
+                <p class="text-muted mb-3">報名「AIS3 榮譽考試」，通過檢定即可參加暑期密集營隊與助教面對面討論專題！</p>
+                <a href="/register" class="btn btn-primary me-2">立即報名考試</a>
+                <a href="/" class="btn btn-outline-secondary">返回首頁</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 頁尾 -->
+    {% include "public/_footer.html" %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

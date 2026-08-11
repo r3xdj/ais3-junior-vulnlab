@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>實戰攻防訓練 - AIS3 Student Portal</title>
+    <!-- 引入 Bootstrap 5 CSS 與 Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+<body class="bg-light">
+
+    <!-- 頂部導覽列 -->
+    {% include "public/_navbar.html" %}
+
+    <!-- 主視覺 Header -->
+    <header class="bg-dark text-white py-5 border-bottom border-primary border-4">
+        <div class="container text-center my-3">
+            <h1 class="display-5 fw-bold"><i class="bi bi-cpu text-primary me-2"></i>資安實戰攻防核心模組</h1>
+            <p class="lead text-muted">模擬真實企業微服務架構，培養具備全方位滲透測試與漏洞分析能力之資安人才</p>
+        </div>
+    </header>
+
+    <!-- 攻防訓練四大模組 -->
+    <div class="container py-5">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">階梯式攻防實踐地圖</h2>
+            <p class="text-muted">從外網資產偵查、Web 邏輯漏洞利用，一路滲透至內網微服務與系統提權</p>
+        </div>
+
+        <div class="row g-4">
+            <!-- 模組 1 -->
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-primary text-white rounded-circle p-3 me-3">
+                                <i class="bi bi-search fs-3"></i>
+                            </div>
+                            <div>
+                                <h4 class="card-title fw-bold mb-0">Phase 1: 邊界偵查與資產外洩</h4>
+                                <span class="badge bg-secondary">Reconnaissance & Web</span>
+                            </div>
+                        </div>
+                        <p class="card-text text-muted">
+                            學習如何發現企業邊界入口的隱藏資產與已知漏洞。包含 Apache CVE 漏洞利用、敏感檔案（如 <code>.git</code> 版本控制與環境變數 <code>.env</code>）外洩讀取與源碼分析。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 模組 2 -->
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-danger text-white rounded-circle p-3 me-3">
+                                <i class="bi bi-bug fs-3"></i>
+                            </div>
+                            <div>
+                                <h4 class="card-title fw-bold mb-0">Phase 2: Web 服務與身分驗證破壞</h4>
+                                <span class="badge bg-danger">Web Logic & Injection</span>
+                            </div>
+                        </div>
+                        <p class="card-text text-muted">
+                            深入探索後端 API 邏輯陷阱，包含 JWT Session 驗證繞過、手動字串拼接導致的 <strong>JSON Injection</strong> 權限提升，以及伺服器端請求偽造 (SSRF) 攻擊。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 模組 3 -->
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-warning text-dark rounded-circle p-3 me-3">
+                                <i class="bi bi-diagram-3 fs-3"></i>
+                            </div>
+                            <div>
+                                <h4 class="card-title fw-bold mb-0">Phase 3: 內網橫向移動與微服務滲透</h4>
+                                <span class="badge bg-warning text-dark">Lateral Movement & Redis</span>
+                            </div>
+                        </div>
+                        <p class="card-text text-muted">
+                            穿透 <code>internal_net</code> 網路隔離層。利用 SSRF 結合 Gopher 協定對未授權 Redis 進行命令注入，探索 PostgreSQL 資料庫與背景 Celery 任務佇列。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 模組 4 -->
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-success text-white rounded-circle p-3 me-3">
+                                <i class="bi bi-terminal fs-3"></i>
+                            </div>
+                            <div>
+                                <h4 class="card-title fw-bold mb-0">Phase 4: 系統反序列化與權限提升</h4>
+                                <span class="badge bg-success">RCE & Privilege Escalation</span>
+                            </div>
+                        </div>
+                        <p class="card-text text-muted">
+                            實作 Python Pickle 序列化 RCE 取得容器 Shell，並利用 Linux 定時維護腳本（Cronjob / SUID / Tar 萬用字元漏洞）提權至 Root 取得終極 Flag。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 練習行動呼籲 -->
+        <div class="card bg-primary text-white border-0 shadow mt-5">
+            <div class="card-body p-5 text-center">
+                <h3 class="fw-bold mb-3">準備好實測你的攻防實戰能力了嗎？</h3>
+                <p class="lead mb-4">報名 AIS3 榮譽考試，挑戰階梯式 Boot2Root 靶機題庫！</p>
+                <a href="/register" class="btn btn-light btn-lg fw-bold text-primary px-4 me-2">立即報名考試</a>
+                <a href="/" class="btn btn-outline-light btn-lg px-4">返回首頁</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 頁尾 -->
+    {% include "public/_footer.html" %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

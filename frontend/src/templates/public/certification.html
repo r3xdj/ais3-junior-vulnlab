@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>榮譽認證 - AIS3 Student Portal</title>
+    <!-- 引入 Bootstrap 5 CSS 與 Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+<body class="bg-light">
+
+    <!-- 頂部導覽列 -->
+    {% include "public/_navbar.html" %}
+
+    <!-- 主視覺 Header -->
+    <header class="bg-dark text-white py-5 border-bottom border-primary border-4">
+        <div class="container text-center my-3">
+            <h1 class="display-5 fw-bold"><i class="bi bi-award text-warning me-2"></i>AIS3 榮譽實戰認證</h1>
+            <p class="lead text-muted">通過實戰能力檢定，獲得教育部 AIS3 計畫與產官學界認可之技術認證</p>
+        </div>
+    </header>
+
+    <div class="container py-5">
+        <div class="row align-items-center g-5">
+            <!-- 左側說明 -->
+            <div class="col-lg-7">
+                <h2 class="fw-bold mb-4">為什麼需要考取 AIS3 榮譽認證？</h2>
+                
+                <div class="d-flex mb-4">
+                    <div class="me-3 fs-2 text-primary"><i class="bi bi-lightning-charge-fill"></i></div>
+                    <div>
+                        <h4 class="fw-bold">直升資安暑期營隊</h4>
+                        <p class="text-muted">通過榮譽考試者可免除繁複的審查流程，直接獲得 7 月底密集培訓營隊與分組專題競賽的參賽資格。</p>
+                    </div>
+                </div>
+
+                <div class="d-flex mb-4">
+                    <div class="me-3 fs-2 text-primary"><i class="bi bi-cpu-fill"></i></div>
+                    <div>
+                        <h4 class="fw-bold">自動化雷達圖證書產出</h4>
+                        <p class="text-muted">考試系統由背景處理器（Celery Worker）根據你在 Web 滲透、API 安全、內網橫向與提權上的能力分數，即時繪製個人化的 PDF 雷達圖結業證書。</p>
+                    </div>
+                </div>
+
+                <div class="d-flex mb-4">
+                    <div class="me-3 fs-2 text-primary"><i class="bi bi-patch-check-fill"></i></div>
+                    <div>
+                        <h4 class="fw-bold">企業求職能力證明</h4>
+                        <p class="text-muted">榮譽認證清楚標示你在真實企業級架構下的漏洞發現與修補能力，是加入高階資安團隊的最強通行證。</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右側證書預覽卡片 -->
+            <div class="col-lg-5">
+                <div class="card shadow-lg border-primary">
+                    <div class="card-header bg-primary text-white text-center py-3">
+                        <h5 class="fw-bold mb-0"><i class="bi bi-file-earmark-pdf me-2"></i>榮譽證書預覽</h5>
+                    </div>
+                    <div class="card-body p-4 text-center">
+                        <div class="p-4 border rounded bg-white mb-3">
+                            <i class="bi bi-shield-check text-warning display-1"></i>
+                            <h4 class="fw-bold mt-3 mb-1">AIS3 Honor Certificate</h4>
+                            <p class="text-muted small">Certificated Security Specialist</p>
+                            <hr>
+                            <p class="small text-start mb-1"><strong>學員姓名：</strong> [ 註冊學員名稱 ]</p>
+                            <p class="small text-start mb-1"><strong>認證主題：</strong> 榮譽實戰檢定合格</p>
+                            <p class="small text-start mb-0"><strong>綜合評級：</strong> Grade A+ (全維度通過)</p>
+                        </div>
+                        <a href="/register" class="btn btn-primary w-100 btn-lg">立即報名以取得證書</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 認證取得流程 -->
+        <div class="mt-5 pt-5 border-top">
+            <h3 class="fw-bold text-center mb-5">取得認證的 4 個步驟</h3>
+            <div class="row text-center g-4">
+                <div class="col-md-3">
+                    <div class="p-3 bg-white rounded shadow-sm h-100">
+                        <div class="display-5 text-primary fw-bold mb-2">1</div>
+                        <h5>線上註冊</h5>
+                        <p class="text-muted small mb-0">填寫基本資料並選擇報名組別</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3 bg-white rounded shadow-sm h-100">
+                        <div class="display-5 text-primary fw-bold mb-2">2</div>
+                        <h5>參加檢定</h5>
+                        <p class="text-muted small mb-0">連線至實戰靶機環境進行解題</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3 bg-white rounded shadow-sm h-100">
+                        <div class="display-5 text-primary fw-bold mb-2">3</div>
+                        <h5>取得 Flag</h5>
+                        <p class="text-muted small mb-0">依序送出階段關卡金鑰 (Flags)</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3 bg-white rounded shadow-sm h-100">
+                        <div class="display-5 text-primary fw-bold mb-2">4</div>
+                        <h5>發放證書</h5>
+                        <p class="text-muted small mb-0">系統自動繪製並下載 PDF 證書</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 頁尾 -->
+    {% include "public/_footer.html" %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

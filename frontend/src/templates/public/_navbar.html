@@ -10,6 +10,9 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto align-items-center">
                 <li class="nav-item"><a class="nav-link {{ 'active' if request.path == '/' else '' }}" href="/">首頁</a></li>
+                <li class="nav-item"><a class="nav-link {{ 'active' if request.path == '/practice' else '' }}" href="/practice">實戰攻防</a></li>
+                <li class="nav-item"><a class="nav-link {{ 'active' if request.path == '/certification' else '' }}" href="/certification">榮譽認證</a></li>
+                <li class="nav-item"><a class="nav-link {{ 'active' if request.path == '/ta' else '' }}" href="/ta">頂尖助教</a></li>
                 <li class="nav-item"><a class="nav-link {{ 'active' if request.path == '/about' else '' }}" href="/about">關於 AIS3</a></li>
                 <li class="nav-item"><a class="nav-link {{ 'active' if request.path == '/login' else '' }}" href="/login">學員登入</a></li>
                 <li class="nav-item ms-2">

@@ -12,6 +12,18 @@ def index():
 def about():
     return render_template('public/about.html')
 
+@app.route('/practice')
+def practice():
+    return render_template('public/practice.html')
+
+@app.route('/certification')
+def certification():
+    return render_template('public/certification.html')
+
+@app.route('/ta')
+def ta():
+    return render_template('public/ta.html')
+
 # ---- 認證頁面(畫面殼,邏輯打 web-gateway 的 API)----
 @app.route('/login')
 @redirect_if_logged_in
