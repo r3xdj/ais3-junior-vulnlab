@@ -55,3 +55,11 @@ docker compose up -d --build
 ```
 
 然後訪問 http://localhost:8080
+
+## 關閉
+
+```
+docker compose down -v
+```
+
+記得加上 `-v` 才會清除資料庫
