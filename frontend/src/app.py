@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect
 from decorators import require_login_page, require_admin_page, redirect_if_logged_in
 
 app = Flask(__name__)
@@ -81,6 +81,11 @@ def user_activity():
 @require_login_page
 def user_password():
     return render_template('user/password.html')
+
+# ---- rickroll ----
+@app.route('/robots.txt')
+def robots_txt():
+    return redirect('https://youtu.be/-so1CRzBB7s', code=302)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=3000)
