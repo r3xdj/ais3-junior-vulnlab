@@ -1,0 +1,93 @@
+{% extends "base_app.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <h1>教材下載區</h1>
+
+    <div id="materials-list">
+        <p>載入教材中...</p>
+    </div>
+</div>
+
+<script>
+async function loadMaterials() {
+    const container = document.getElementById("materials-list");
+
+    try {
+        const response = await fetch("/api/materials");
+
+        if (!response.ok) {
+            throw new Error("HTTP " + response.status);
+        }
+
+        const materials = await response.json();
+
+        if (materials.length === 0) {
+            container.innerHTML = "<p>目前沒有教材。</p>";
+            return;
+        }
+
+        container.innerHTML = "";
+
+        materials.forEach(material => {
+            const item = document.createElement("div");
+
+            item.className = "material-item mb-3";
+
+            const title = document.createElement("h3");
+            title.textContent = material.name;
+
+            const button = document.createElement("button");
+            button.textContent = "閱讀教材";
+            button.className = "btn btn-primary";
+
+            button.addEventListener("click", () => {
+                readMaterial(material.file);
+            });
+
+            item.appendChild(title);
+            item.appendChild(button);
+
+            container.appendChild(item);
+        });
+
+    } catch (error) {
+        console.error("Failed to load materials:", error);
+        container.innerHTML = "<p>無法取得教材列表。</p>";
+    }
+}
+
+
+async function readMaterial(filename) {
+    try {
+        const body = new URLSearchParams();
+        body.append("file", filename);
+
+        const response = await fetch("/api/materials/read", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: body.toString()
+        });
+
+        if (!response.ok) {
+            throw new Error("HTTP " + response.status);
+        }
+
+        const blob = await response.blob();
+
+        const url = URL.createObjectURL(blob);
+
+        window.open(url, "_blank");
+
+    } catch (error) {
+        console.error("Failed to read material:", error);
+        alert("教材讀取失敗");
+    }
+}
+
+
+loadMaterials();
+</script>
+{% endblock %}

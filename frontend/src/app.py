@@ -1,7 +1,10 @@
-from flask import Flask, render_template, redirect
+from flask import Flask, render_template, redirect, request, Response
+import urllib.request
 from decorators import require_login_page, require_admin_page, redirect_if_logged_in
 
 app = Flask(__name__)
+
+GATEWAY_URL = "http://web-gateway:5000"
 
 # ---- 公開行銷頁面 ----
 @app.route('/')
@@ -15,6 +18,47 @@ def about():
 @app.route('/practice')
 def practice():
     return render_template('public/practice.html')
+
+@app.route('/materials')
+def materials():
+    return render_template('public/materials.html')
+
+@app.route('/api/materials')
+def materials_api():
+    response = urllib.request.urlopen(
+        f"{GATEWAY_URL}/api/materials"
+    )
+
+    data = response.read()
+
+    return Response(
+        data,
+        status=response.status,
+        content_type=response.headers.get("Content-Type", "application/json")
+    )
+
+
+@app.route('/api/materials/read', methods=['POST'])
+def read_material_api():
+    data = request.get_data()
+
+    req = urllib.request.Request(
+        f"{GATEWAY_URL}/api/materials/read",
+        data=data,
+        method="POST",
+        headers={
+            "Content-Type": request.content_type or
+            "application/x-www-form-urlencoded"
+        }
+    )
+
+    response = urllib.request.urlopen(req)
+
+    return Response(
+        response.read(),
+        status=response.status,
+        content_type=response.headers.get("Content-Type", "text/plain")
+    )
 
 @app.route('/certification')
 def certification():
