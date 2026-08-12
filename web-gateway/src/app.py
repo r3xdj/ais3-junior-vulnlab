@@ -5,7 +5,6 @@ from routes.auth import auth_bp
 from routes.admin import register_admin_blueprints
 from routes.user import register_user_blueprints
 from db import close_pool
-from routes.image import image_bp
 from routes.materials import material_bp
 
 def create_app():
@@ -14,7 +13,6 @@ def create_app():
     register_admin_blueprints(app)
     register_user_blueprints(app)
 
-    app.register_blueprint(image_bp)
     app.register_blueprint(material_bp)
     return app
 
