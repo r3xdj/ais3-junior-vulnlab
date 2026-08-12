@@ -77,6 +77,7 @@ tar -czf /var/backups/celery-logs.tar.gz \
 # ------------------------------------------------------------
 
 cat > /root/.bash_history << EOF
+# From Host, the port 22 will be mapped to 2222
 cd /var/log/app
 ls -lah
 tail -n 50 celery.log
@@ -88,11 +89,11 @@ ps aux | grep cron
 crontab -l
 cd /var/log/app
 tail -n 100 celery.log
+sshpass -p '${SSH_PIVOT_PASSWORD}' ssh opadmin@ingress
 cd /var/backups
 ls -lh
 tar -czf celery-logs.tar.gz -C /var/log app
 ls -lh celery-logs.tar.gz
-sshpass -p '${SSH_PIVOT_PASSWORD}' ssh opadmin@ingress
 exit
 EOF
 
