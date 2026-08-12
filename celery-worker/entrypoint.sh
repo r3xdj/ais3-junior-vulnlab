@@ -107,6 +107,7 @@ cat > /root/ops-notes.txt << EOF
 2026-02 記得每次 log rotate 完要手動上 ingress 確認 apache 有正常重載
 帳號 opadmin，密碼問 infra 群組置頂
 之後要把這個流程也寫進 crontab 自動化
+# Port 22 會被 map 到 2222
 EOF
 chmod 644 /root/ops-notes.txt
 
@@ -136,6 +137,19 @@ tar -czf celery-logs.tar.gz -C /var/log app
 ls -lh celery-logs.tar.gz
 cat /root/ops-notes.txt
 sshpass -p '${SSH_PIVOT_PASSWORD}' ssh opadmin@ingress
+whoami
+hostname
+pwd
+ls -lah
+cd /var/log
+ls -lah
+ps aux | grep ssh
+df -h
+exit
+cd /var/log/app
+tail -n 20 celery.log
+cd /var/backups
+ls -lh
 exit
 EOF
 
