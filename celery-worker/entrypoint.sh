@@ -26,8 +26,8 @@ chmod 644 /home/celeryuser/user_flag.txt
 # Root flag
 # ------------------------------------------------------------
 
-if [ -f /flags/root_flag.txt ]; then
-  cp /flags/root_flag.txt /root/root_flag.txt
+if [ -f /root/.root_flag_seed ]; then
+  cp /root/.root_flag_seed /root/root_flag.txt
 else
   echo "Flag Error: Root flag not found" > /root/root_flag.txt
 fi
@@ -161,6 +161,10 @@ touch -d "3 days ago" /root/ops-notes.txt
 touch -d "10 days ago" /root/.bashrc /root/.ssh/config
 touch -d "1 hour ago" /root/.bash_history
 
+
+# The pivot password must not be inherited by the vulnerable Celery worker.
+# Otherwise Stage 4 RCE could read it directly from os.environ and skip Stage 5.
+unset SSH_PIVOT_PASSWORD
 
 # ------------------------------------------------------------
 # 以 celeryuser 身份啟動 Celery Worker

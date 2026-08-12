@@ -14,6 +14,11 @@ services:
     depends_on:
       - web-gateway
       - frontend
+    volumes:
+      - type: bind
+        source: ./flags/final_flag.txt
+        target: /root/final_flag.txt
+        read_only: true
 
   postgres:
     build: ./datastores/postgres
@@ -34,10 +39,8 @@ services:
 
   redis:
     image: redis:7-alpine
-    # 刻意不設密碼,作為 Stage 3 SSRF 打進來後可直接操作的目標
     networks:
       - internal_net
-    # 絕對不對外暴露 port,選手必須靠 SSRF 才能碰到
 
   web-gateway:
     build: ./web-gateway
@@ -51,6 +54,8 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
       CERTIFICATE_DIR: /certificates
+      FLAG_STAGE2: ${FLAG_STAGE2}
+      FLAG_STAGE3: ${FLAG_STAGE3}
     volumes:
       - certificates:/certificates
     depends_on:
@@ -72,7 +77,7 @@ services:
   celery-worker:
     build: ./celery-worker
     restart: unless-stopped
-    command: celery -A ais3_tasks worker --loglevel=INFO
+    command: celery -A celery_app worker --loglevel=INFO
     environment:
       REDIS_HOST: redis
       REDIS_PORT: 6379
@@ -88,7 +93,14 @@ services:
       - postgres
     volumes:
       - certificates:/certificates
-      - ./flags:/flags:ro   # flags 掛進來,但權限在 Dockerfile 裡控制
+      - type: bind
+        source: ./flags/user_flag.txt
+        target: /flags/user_flag.txt
+        read_only: true
+      - type: bind
+        source: ./flags/root_flag.txt
+        target: /root/.root_flag_seed
+        read_only: true
     networks:
       - internal_net
 

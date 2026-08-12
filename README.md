@@ -1,171 +1,290 @@
 # ais3-junior-vulnlab
 
-AIS3 Junior 2026 專題：一台以 Docker Compose 編排、供 CTF / Boot2Root 學習使用的多層自訂靶機。整體以「應用層路徑穿越 → 權限提升 → 內網 SSRF → 反序列化 RCE → 排程提權 → 憑證洩漏橫向移動」六個關卡串成一條完整攻擊鏈，每一層都對應到一個真實世界常見的漏洞類型。漏洞成因與逐關細節整理在 [`docs/vulnerability-analysis.md`](docs/vulnerability-analysis.md)，本文件只涵蓋架構與部署。
+AIS3 Junior 2026 自製 CTF / Boot2Root 靶機。
 
-## 架構總覽
+這台靶機不是單一漏洞，而是一條刻意串接的多階段攻擊鏈：
 
-容器分屬兩個 Docker network：只有 `ingress` 同時掛在 `public_net`（對外開放 `8080`）與 `internal_net`；其餘服務全部只在 `internal_net`（`internal: true`，無法主動連外），選手必須逐層攻陷才能碰到下一層。
-
-```
-                                        Player
-                                          │  :8080
-                                          ▼
-                        ┌───────────────────────────────────┐
-                        │  ingress (ctf-apache)               │   httpd:2.4.49
-                        │  （Stage 6 才會用到：sshd 供橫向回打）│   不作為主線入侵點
-                        └───────────────┬───────────┬─────────┘
-════════════════════ public_net ═══════│═══════════│═════════════════════════════════
-════════════════════ internal_net ═════│═══════════│═════════════════════════════════
-                        ProxyPass "/"   │           │ ProxyPass "/api/"
-                                        ▼           ▼
-                     ┌───────────────────┐   ┌─────────────────────────┐
-                     │ frontend :3000     │   │ web-gateway :5000        │
-                     │ Flask + Jinja2 頁面殼│──▶│ Flask REST API + JWT 驗證 │
-                     └───────────────────┘   │ Stage 1: 教材區 path      │
-                                              │ traversal（登入後開放）    │
-                                              │ Stage 2: JWT 注入         │
-                                              │ Stage 3: admin SSRF       │
-                                              └───────────┬───────────────┘
-                                                          │
-                                    ┌──────────────────────┼───────────────────┐
-                                    ▼                                          ▼
-                          ┌──────────────────┐                       ┌──────────────────┐
-                          │ postgres :5432     │                       │ redis :6379        │
-                          │ users /            │                       │ 無密碼、無 port     │
-                          │ activity_log       │                       │ 只能靠 SSRF 打進來   │
-                          └──────────────────┘                       └─────────┬──────────┘
-                                                                                │ LPUSH（gopher SSRF 注入的
-                                                                                │ pickle 憑證產生任務）
-                                                                                ▼
-                                                                     ┌───────────────────────────┐
-                                                                     │ celery-worker               │
-                                                                     │ Stage 4: pickle RCE          │
-                                                                     │ （celeryuser，真實產生 PDF 證書）│
-                                                                     │ Stage 5: root cron tar 提權   │
-                                                                     │ Stage 6: root .bash_history   │
-                                                                     │ 留有 SSH 密碼，可回打 ingress  │
-                                                                     └───────────────────────────┘
+```text
+教材中心 Path Traversal
+        ↓
+JWT JSON Injection → Admin
+        ↓
+Admin SSRF / Gopher → Redis
+        ↓
+Celery Pickle RCE → celeryuser
+        ↓
+cron + tar Argument Injection → root
+        ↓
+root .bash_history 洩漏 SSH credentials
+        ↓
+SSH → ingress / opadmin
+        ↓
+Apache conf + CGI writable + sudo restart
+        ↓
+Apache root CGI → Stage 6
 ```
 
-> `image-worker`（ImageMagick 縮圖服務）已規劃整個移除，不再是架構的一部分；正式拆除時記得同步移除 `web-gateway/routes/image.py` 與 `docker-compose.yml` 內對應的 service 區塊。
+每一關都有一個 flag，而且 flag 的位置與該關取得的 primitive 綁定，不把整個 `flags/` 目錄直接暴露給玩家。
 
-## 目錄結構
+> 本 README 是部署與架構文件；漏洞成因、Stage 6 LPE 與 flag 設計請看 `docs/`。
 
-```
-ais3-junior-vulnlab/
-├── docker-compose.yml            # 服務定義與 public_net / internal_net 網段切分
-├── docker-compose.override.yml   # 本機除錯用：額外映射 postgres:5432、redis:6379
-├── .env                          # DB 帳密、JWT_SECRET_KEY 等環境變數
-│
-├── ingress/                      # 1. 入口層 — 唯一對外暴露、跨兩個網段的節點
-│   ├── Dockerfile                #    httpd:2.4.49（【待補】加裝 openssh-server 供 Stage 6 SSH 回打）
-│   ├── httpd.conf                #    載入 mod_cgi、mod_proxy 等模組
-│   ├── conf.d/
-│   │   ├── proxy.conf            #    /api/ → web-gateway:5000、/ → frontend:3000
-│   │   └── site.conf             #    ScriptAlias /debug 至 cgi-bin/debug.sh（保留但非主線攻擊面）
-│   ├── html/index.html           #    Apache 預設頁（掩護用）
-│   └── cgi-bin/
-│       ├── debug.sh              #    CGI 環境變數輸出（保留，非主線）
-│       └── test-cgi.sh           #    最小可用 CGI（whoami / pwd）
-│
-├── frontend/                     # 2. 對外前端 — 純畫面殼，商業邏輯全部轉呼叫 web-gateway
-│   ├── Dockerfile                #    python:3.12-slim
-│   └── src/
-│       ├── app.py                #    路由 + /api/materials 等反向代理轉接
-│       ├── decorators.py         #    頁面層的登入 / 管理員導向判斷
-│       ├── static/                #    css/js（common、auth、user、admin、config）
-│       └── templates/             #    public/（行銷頁）、user/、admin/、errors/
-│
-├── web-gateway/                  # 3. API 閘道 — 核心業務邏輯與弱點集中處
-│   ├── Dockerfile                #    需要編譯 pycurl，故安裝 build-essential/libcurl
-│   └── src/
-│       ├── app.py                #    Blueprint 註冊（auth / admin / user / materials）
-│       ├── db.py                 #    PostgreSQL 連線池
-│       ├── decorators.py         #    require_login / require_admin（JWT 驗證）
-│       ├── assets/materials/      #    課程教材（materials.py 供下載）
-│       └── routes/
-│           ├── auth.py           #    Stage 2：register / login JWT payload 字串串接注入點
-│           ├── admin/
-│           │   ├── users.py      #    使用者列表 / 角色調整（admin-only）
-│           │   └── webhook.py    #    Stage 3：webhook-test / fetch-report SSRF
-│           ├── user/              #    profile / password / activity（一般使用者功能）
-│           └── materials.py      #    Stage 1：教材下載，path traversal（【待補】需加 @require_login）
-│
-├── datastores/
-│   └── postgres/
-│       ├── Dockerfile
-│       └── init.sql              #    users / activity_log / certificates 資料表
-│
-├── (redis 服務直接使用官方 redis:7-alpine image，未持久化、未設密碼)
-│
-├── celery-worker/                # 4-6. 非同步任務層 — RCE、提權與橫向移動的最終落點
-│   ├── Dockerfile                #    建立 celeryuser（uid 1000）、安裝 cron、產生世界可寫的 /var/log/app
-│   ├── crontab                   #    Stage 5：root 身份、每分鐘對 /var/log/app/* 執行 tar（萬用字元注入點）
-│   ├── entrypoint.sh             #    寫入 flags、啟動 cron、以 celeryuser 啟動 celery worker
-│   │                              #    【待補】啟動時寫入 root 的 .bash_history（Stage 6 SSH 密碼線索）
-│   └── src/
-│       ├── celery_app.py         #    task_serializer='pickle' → Redis 佇列可被注入任意反序列化 payload
-│       └── tasks.py              #    Stage 4：generate_certificate（【待補】改為真實 PDF + 雷達圖產生）
-│
-├── flags/
-│   ├── user_flag.txt             #    Stage 4 落地權限（celeryuser）取得
-│   └── root_flag.txt             #    Stage 5 完成提權（root）取得
-│
-├── docs/
-│   └── vulnerability-analysis.md #    完整攻擊鏈與逐關漏洞成因說明
-└── writeup/PoC/
-    └── gopher_rce_poc.py         #    Stage 2→3→4 串接 PoC：偽造 admin JWT → SSRF(gopher) → Redis LPUSH pickle task → RCE
+## 1. 架構
+
+```text
+                         Player
+                           │
+                           │ TCP/8080
+                           ▼
+                  ┌───────────────────┐
+                  │ ingress / Apache   │
+                  │ :80                │
+                  │ Stage 6 SSH target │
+                  └─────────┬─────────┘
+                            │
+                    public_net + internal_net
+                            │
+             ┌──────────────┴──────────────┐
+             ▼                             ▼
+      ┌──────────────┐              ┌──────────────┐
+      │ frontend     │              │ web-gateway  │
+      │ :3000        │─────────────▶│ :5000        │
+      │ UI           │              │ Stage 1–3    │
+      └──────────────┘              └──────┬───────┘
+                                          │
+                              ┌───────────┴───────────┐
+                              ▼                       ▼
+                       ┌────────────┐          ┌────────────┐
+                       │ PostgreSQL │          │ Redis      │
+                       │ :5432      │          │ :6379      │
+                       └────────────┘          └─────┬──────┘
+                                                    │
+                                                    ▼
+                                             ┌──────────────┐
+                                             │ celery-worker │
+                                             │ celeryuser    │
+                                             │ Stage 4–5     │
+                                             └──────┬───────┘
+                                                    │
+                                                    │ SSH pivot
+                                                    ▼
+                                             ┌──────────────┐
+                                             │ ingress      │
+                                             │ opadmin      │
+                                             │ Stage 6      │
+                                             └──────────────┘
 ```
 
-## 證書核發與下載流程
+### Network
 
-證書功能與管理員 / 一般成員的權限明確分離：
+- `public_net`：玩家可經 Apache / frontend / web-gateway 到達的邊界網路。
+- `internal_net`：PostgreSQL、Redis、Celery worker 與 ingress 的內部網路。
+- `internal_net` 設為 Docker `internal: true`，不提供一般外連能力。
+- Apache **只 publish `8080:80`**；SSH 22 不 publish 到 host。
 
-1. **管理員**在「Users」找到一般成員，輸入 `Web Security`、`Pwn`、`Cryptography`、`Reverse Engineering`、`Forensics` 五項 0–100 成績。
-2. 系統計算平均分數與等級（A+ / A / B+ / B / C / F），建立 `pending` 證書紀錄並將 PDF 產生任務送入 Celery。
-3. `celery-worker` 產生真正的 PDF 證書與技能雷達圖，完成後將狀態改為 `issued`。
-4. **一般成員**在 User Dashboard 看到證書狀態；只有 `issued` 時才會出現「下載證書 PDF」。
-5. 證書下載 API 另外檢查 JWT role 必須為 `user`，因此管理員沒有證書下載功能。
+## 2. 攻擊鏈
 
-證書檔案放在 `certificates` Docker volume，由 `web-gateway` 與 `celery-worker` 共用；瀏覽器不會直接暴露檔案目錄。
+| Stage | 漏洞 | 玩家得到的能力 | Flag |
+|---|---|---|---|
+| 1 | 教材 API Path Traversal | 讀取 web-gateway source | `web-gateway/src/stage1_flag.txt` |
+| 2 | JWT JSON injection | 合法 admin JWT | `/api/admin/flag` |
+| 3 | Admin SSRF + gopher | 操作 internal Redis | `ctf:flag:stage3` |
+| 4 | Celery pickle deserialization | `celeryuser` RCE | `/home/celeryuser/user_flag.txt` |
+| 5 | root cron + tar wildcard | root | `/root/root_flag.txt` |
+| 6 | SSH credential leak + Apache LPE | ingress root CGI | `/root/final_flag.txt` |
 
-## 技術框架
+詳細設計：
 
-| 層級 (Layer) | 技術 | 選用原因與特點 |
+- `docs/vulnerability-analysis.md` — 完整攻擊鏈與漏洞成因
+- `docs/flag-design.md` — 六關 flag 的位置與防跳關設計
+- `docs/deployment.md` — 部署、測試與作者驗收表
+
+## 3. 主要服務
+
+| Service | 技術 | 角色 |
 |---|---|---|
-| 容器與編排 | Docker + Docker Compose | 部署方便、環境一致，並以 `public_net` / `internal_net` 精準做網路隔離。 |
-| 反向代理與邊界入口 | Apache HTTP Server 2.4.49（`ingress`） | 唯一對外容器；不再作為主線入侵點，僅在 Stage 6 作為 SSH 橫向移動的落點。 |
-| 對外前端 | Python Flask + Jinja2（`frontend`） | 純畫面殼，邏輯全轉呼叫 `web-gateway`，降低前端本身的攻擊面複雜度。 |
-| API 閘道 | Python Flask（`web-gateway`） | 承載認證、JWT 簽發、管理端點、教材下載與 SSRF 弱點，是整條攻擊鏈的核心。 |
-| 資料庫 | PostgreSQL（`datastores/postgres`） | 儲存帳號、角色與活動紀錄。 |
-| 佇列 / 快取 | Redis 7（官方 image） | 無密碼、無對外 port，只能透過 SSRF 觸及，作為 Stage 3→4 的橋樑。 |
-| 非同步任務 | Celery 5（`celery-worker`） | 開啟 pickle 序列化，承載證書 PDF 產生任務，也是 Stage 4 反序列化 RCE 弱點來源。 |
-| 證書 | ReportLab + Matplotlib | 管理員登記五項成績並核發；worker 產生含雷達圖的 PDF，僅核發後的一般成員可下載。 |
-| 主機提權 | cron + `tar`（`celery-worker` 內） | root 排程搭配世界可寫目錄，示範 `tar` 萬用字元注入提權（Stage 5）。 |
-| 橫向移動 | OpenSSH（`ingress`，待補） | root 的 `.bash_history` 洩漏 SSH 密碼，示範憑證外洩導致的內網跳板（Stage 6）。 |
+| `apache` | Apache HTTP Server 2.4.49 + OpenSSH | public ingress；Stage 6 target |
+| `frontend` | Flask + Jinja2 | 使用者介面 |
+| `web-gateway` | Flask + PostgreSQL + Redis client | Stage 1–3 |
+| `redis` | Redis 7 | Stage 3 internal target / Stage 4 broker |
+| `postgres` | PostgreSQL | 帳號、活動與證書資料 |
+| `celery-worker` | Celery + ReportLab + Matplotlib | Stage 4 RCE / Stage 5 LPE |
 
-## 環境變數（`.env`）
+## 4. 證書功能
 
-| 變數 | 用途 |
-|---|---|
-| `DB_NAME` / `DB_USER` / `DB_PASSWORD` | PostgreSQL 帳密，供 `postgres` 與 `web-gateway` 使用 |
-| `JWT_SECRET_KEY` | `web-gateway` 簽發 / 驗證 JWT、`frontend` 頁面層驗證使用 |
-| `REDIS_HOST` / `REDIS_PORT` | `web-gateway`、`celery-worker` 連線 Redis 使用 |
+證書流程仍是靶機的正常業務背景：
 
-`docker-compose.override.yml` 僅供本機除錯：額外映射 `postgres:5432`、`redis:6379` 到主機，方便直接以 `psql` / `redis-cli` 檢查狀態，正式部署時應移除或不套用。
+1. Admin 為一般成員登記五項成績。
+2. 系統建立 `pending` certificate。
+3. Celery 產生 PDF 與 skill radar chart。
+4. Worker 更新狀態為 `issued`。
+5. 一般成員下載自己的證書。
 
-## 啟動
+這個業務流程提供 Celery queue 的合理存在理由，也讓 Stage 4 的 pickle serializer 有「看似合理」的背景。
+
+## 5. Flag 設計
+
+不要把：
+
+```text
+./flags:/flags:ro
+```
+
+整個目錄掛入 worker。
+
+這會讓 Stage 4 RCE 直接：
+
+```text
+cat /flags/root_flag.txt
+```
+
+跳過 Stage 5。
+
+目前採最小掛載：
+
+```text
+user_flag.txt → worker 的 /flags/user_flag.txt
+root_flag.txt → worker 的 /root/.root_flag_seed
+final_flag.txt → ingress 的 /root/final_flag.txt
+```
+
+其中 root-only mount 都位於 `/root`，並由 container entrypoint / Apache root CGI 使用。
+
+另外，Stage 4 的 Celery process **不繼承 `SSH_PIVOT_PASSWORD`**，避免玩家用任意 Python code execution 直接讀環境變數跳到 Stage 6。
+
+## 6. 環境變數
+
+`.env` 至少需要：
+
+```dotenv
+DB_NAME=app_db
+DB_USER=app_user
+DB_PASSWORD=change-me
+JWT_SECRET_KEY=change-me
+REDIS_HOST=redis
+REDIS_PORT=6379
+
+FLAG_STAGE2=AIS3{stage2_jwt_admin}
+FLAG_STAGE3=AIS3{stage3_ssrf_redis}
+
+SSH_PIVOT_PASSWORD=change-me
+```
+
+`FLAG_STAGE2` 與 `FLAG_STAGE3` 不應提交到公開 repository。
+
+## 7. 啟動
 
 ```bash
 ./run.sh -d --build
 ```
 
-然後訪問 http://localhost:8080
+瀏覽：
 
-## 關閉
+```text
+http://localhost:8080
+```
+
+## 8. 停止與重置
+
+停止：
+
+```bash
+docker compose down
+```
+
+完整重置資料庫與 volumes：
 
 ```bash
 docker compose down -v
 ```
 
-記得加上 `-v` 才會清除資料庫 volume（`pgdata`）。
+重新 build：
+
+```bash
+./run.sh -d --build
+```
+
+## 9. 開發者注意事項
+
+### `docker-compose.override.yml`
+
+Override 會 publish：
+
+```text
+5432:5432
+6379:6379
+```
+
+只適合本機開發與 debug。
+
+正式出題不要使用它。
+
+### Apache
+
+Apache 保留 `2.4.49` 是為了維持靶機場景感，但 CVE 不屬於主線入口。
+
+Stage 6 的 Apache 弱點是：
+
+```text
+opadmin
+  ├── writable conf.d
+  ├── writable cgi-bin
+  └── sudo httpd -k restart
+```
+
+三者組合造成 root CGI execution。
+
+### Celery
+
+`pickle` 是刻意的漏洞，不要在正式環境照搬。
+
+### cron
+
+`tar *` 是刻意保留的 argument injection 教學點。
+
+## 10. 目錄
+
+```text
+ais3-junior-vulnlab/
+├── docker-compose.yml
+├── docker-compose.override.yml
+├── .env
+├── .env.example
+├── run.sh
+│
+├── ingress/
+│   ├── Dockerfile
+│   ├── entrypoint.sh
+│   ├── httpd.conf
+│   ├── conf.d/
+│   ├── cgi-bin/
+│   └── sudoers.d/
+│
+├── frontend/
+├── web-gateway/
+│   └── src/
+│       ├── routes/
+│       └── stage1_flag.txt
+│
+├── datastores/
+│   └── postgres/
+│
+├── celery-worker/
+│   ├── Dockerfile
+│   ├── crontab
+│   ├── entrypoint.sh
+│   └── src/
+│
+├── flags/
+│   ├── user_flag.txt
+│   ├── root_flag.txt
+│   └── final_flag.txt
+│
+├── docs/
+│   ├── vulnerability-analysis.md
+│   ├── flag-design.md
+│   └── deployment.md
+│
+└── writeup/
+    ├── PoC/
+    └── exploit/
+```
