@@ -94,7 +94,7 @@ ais3-junior-vulnlab/
 ├── datastores/
 │   └── postgres/
 │       ├── Dockerfile
-│       └── init.sql              #    users / activity_log / materials 資料表
+│       └── init.sql              #    users / activity_log / certificates 資料表
 │
 ├── (redis 服務直接使用官方 redis:7-alpine image，未持久化、未設密碼)
 │
@@ -117,6 +117,18 @@ ais3-junior-vulnlab/
     └── gopher_rce_poc.py         #    Stage 2→3→4 串接 PoC：偽造 admin JWT → SSRF(gopher) → Redis LPUSH pickle task → RCE
 ```
 
+## 證書核發與下載流程
+
+證書功能與管理員 / 一般成員的權限明確分離：
+
+1. **管理員**在「Users」找到一般成員，輸入 `Web Security`、`Pwn`、`Cryptography`、`Reverse Engineering`、`Forensics` 五項 0–100 成績。
+2. 系統計算平均分數與等級（A+ / A / B+ / B / C / F），建立 `pending` 證書紀錄並將 PDF 產生任務送入 Celery。
+3. `celery-worker` 產生真正的 PDF 證書與技能雷達圖，完成後將狀態改為 `issued`。
+4. **一般成員**在 User Dashboard 看到證書狀態；只有 `issued` 時才會出現「下載證書 PDF」。
+5. 證書下載 API 另外檢查 JWT role 必須為 `user`，因此管理員沒有證書下載功能。
+
+證書檔案放在 `certificates` Docker volume，由 `web-gateway` 與 `celery-worker` 共用；瀏覽器不會直接暴露檔案目錄。
+
 ## 技術框架
 
 | 層級 (Layer) | 技術 | 選用原因與特點 |
@@ -127,7 +139,8 @@ ais3-junior-vulnlab/
 | API 閘道 | Python Flask（`web-gateway`） | 承載認證、JWT 簽發、管理端點、教材下載與 SSRF 弱點，是整條攻擊鏈的核心。 |
 | 資料庫 | PostgreSQL（`datastores/postgres`） | 儲存帳號、角色與活動紀錄。 |
 | 佇列 / 快取 | Redis 7（官方 image） | 無密碼、無對外 port，只能透過 SSRF 觸及，作為 Stage 3→4 的橋樑。 |
-| 非同步任務 | Celery 5（`celery-worker`） | 開啟 pickle 序列化，未來承載真實 PDF 憑證產生功能，也是 Stage 4 反序列化 RCE 弱點來源。 |
+| 非同步任務 | Celery 5（`celery-worker`） | 開啟 pickle 序列化，承載證書 PDF 產生任務，也是 Stage 4 反序列化 RCE 弱點來源。 |
+| 證書 | ReportLab + Matplotlib | 管理員登記五項成績並核發；worker 產生含雷達圖的 PDF，僅核發後的一般成員可下載。 |
 | 主機提權 | cron + `tar`（`celery-worker` 內） | root 排程搭配世界可寫目錄，示範 `tar` 萬用字元注入提權（Stage 5）。 |
 | 橫向移動 | OpenSSH（`ingress`，待補） | root 的 `.bash_history` 洩漏 SSH 密碼，示範憑證外洩導致的內網跳板（Stage 6）。 |
 

@@ -5,7 +5,7 @@ redis_host = os.environ.get('REDIS_HOST', 'redis')
 redis_port = os.environ.get('REDIS_PORT', '6379')
 broker_url = f'redis://{redis_host}:{redis_port}/0'
 
-app = Celery('ais3_tasks', broker=broker_url, backend=broker_url)
+app = Celery('ais3_tasks', broker=broker_url, backend=broker_url, include=['tasks'])
 
 app.conf.update(
     # --- Stage 4 漏洞設計:啟用 pickle 序列化 ---

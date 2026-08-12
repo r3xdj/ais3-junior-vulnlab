@@ -7,6 +7,8 @@ RUN apt-get update \
         openssh-client \
         sshpass \
         tar \
+        fonts-noto-cjk \
+        fonts-dejavu \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -20,8 +22,8 @@ COPY src/ .
 RUN useradd -m -u 1000 celeryuser
 
 # Stage 4: 由 entrypoint 在啟動時從掛載的 /flags 複製 flag
-RUN mkdir -p /home/celeryuser /root && \
-    chown celeryuser:celeryuser /home/celeryuser
+RUN mkdir -p /home/celeryuser /root /certificates && \
+    chown celeryuser:celeryuser /home/celeryuser /certificates
 
 # Stage 5: 建立 world-writable 的 log 目錄,選手可以在這裡放惡意檔案
 RUN mkdir -p /var/log/app /var/backups && \

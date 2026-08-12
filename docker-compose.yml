@@ -46,6 +46,9 @@ services:
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      CERTIFICATE_DIR: /certificates
+    volumes:
+      - certificates:/certificates
     depends_on:
       postgres:
         condition: service_healthy
@@ -72,12 +75,20 @@ services:
     environment:
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      CERTIFICATE_DIR: /certificates
     depends_on:
       - redis
+      - postgres
+    volumes:
+      - certificates:/certificates
+      - ./flags:/flags:ro   # flags 掛進來,但權限在 Dockerfile 裡控制
     networks:
       - internal_net
-    volumes:
-      - ./flags:/flags:ro   # flags 掛進來,但權限在 Dockerfile 裡控制
 
 networks:
   public_net:
@@ -87,3 +98,4 @@ networks:
 
 volumes:
   pgdata:
+  certificates:

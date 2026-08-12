@@ -88,3 +88,38 @@ document.getElementById('passwordForm')?.addEventListener('submit', async (e) =>
         setTimeout(() => { window.location.href = '/login'; }, 1500);
     }
 });
+
+async function loadCertificate() {
+    const button = document.getElementById('certificateDownloadBtn');
+    const summary = document.getElementById('certificateSummary');
+    if (!button || !summary) return;
+
+    const res = await fetch(apiUrl('/api/user/certificate'), { credentials: 'include' });
+    if (!res.ok) {
+        button.disabled = true;
+        button.textContent = '無法取得狀態';
+        return;
+    }
+    const data = await res.json();
+    if (data.issued) {
+        summary.textContent = `已核發｜平均 ${data.average_score}｜${data.grade}`;
+        button.disabled = false;
+        button.textContent = '下載證書 PDF';
+        button.onclick = () => { window.location.href = apiUrl('/api/user/certificate/download'); };
+    } else if (data.status === 'pending') {
+        summary.textContent = '管理員已核發，證書 PDF 正在產生中。';
+        button.disabled = true;
+        button.textContent = '產生中...';
+        setTimeout(loadCertificate, 3000);
+    } else if (data.status === 'failed') {
+        summary.textContent = '證書產生失敗，請聯絡管理員。';
+        button.disabled = true;
+        button.textContent = '無法下載';
+    } else {
+        summary.textContent = '尚未核發證書。';
+        button.disabled = true;
+        button.textContent = '尚未取得';
+    }
+}
+
+window.addEventListener('DOMContentLoaded', loadCertificate);

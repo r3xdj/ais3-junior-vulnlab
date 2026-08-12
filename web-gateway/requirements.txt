@@ -3,3 +3,6 @@ psycopg2-binary==2.9.9
 bcrypt==4.2.0
 PyJWT==2.9.0
 pycurl==7.45.3
+celery==5.3.6
+
+redis==5.0.3

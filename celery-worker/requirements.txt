@@ -1,2 +1,6 @@
 celery==5.3.6
 redis==5.0.3
+matplotlib
+reportlab
+numpy
+psycopg2-binary
