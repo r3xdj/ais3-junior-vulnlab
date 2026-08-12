@@ -10,7 +10,7 @@
 <div class="card shadow-sm">
     <div class="card-body">
         <h2 class="mb-1">User Management</h2>
-        <p class="text-muted">可以查看與變更使用者權限</p>
+        <p class="text-muted">可以查看與變更使用者權限，並替成員登記各項成績與核發證書。管理員本身不提供證書下載。</p>
         <table class="table table-striped align-middle">
             <thead>
                 <tr>
@@ -19,11 +19,39 @@
                     <th>Role</th>
                     <th>Email</th>
                     <th>Created</th>
+                    <th>Certificate</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody id="usersTableBody"></tbody>
         </table>
+    </div>
+</div>
+
+<div class="modal fade" id="certificateModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <form class="modal-content" id="certificateForm">
+            <div class="modal-header">
+                <h5 class="modal-title">登記成績與核發證書</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted small">成員：<strong id="certificateUserName"></strong></p>
+                <input type="hidden" id="certificateUserId">
+                <div class="row g-3">
+                    <div class="col-6"><label class="form-label">Web Security</label><input class="form-control" type="number" min="0" max="100" step="1" id="score_web" required></div>
+                    <div class="col-6"><label class="form-label">Pwn</label><input class="form-control" type="number" min="0" max="100" step="1" id="score_pwn" required></div>
+                    <div class="col-6"><label class="form-label">Cryptography</label><input class="form-control" type="number" min="0" max="100" step="1" id="score_crypto" required></div>
+                    <div class="col-6"><label class="form-label">Reverse Engineering</label><input class="form-control" type="number" min="0" max="100" step="1" id="score_reverse" required></div>
+                    <div class="col-6"><label class="form-label">Forensics</label><input class="form-control" type="number" min="0" max="100" step="1" id="score_forensics" required></div>
+                </div>
+                <div class="form-text mt-3">送出後會立即核發，PDF 由背景 worker 非同步產生。</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="submit" class="btn btn-success">登記並核發</button>
+            </div>
+        </form>
     </div>
 </div>
 {% endblock %}

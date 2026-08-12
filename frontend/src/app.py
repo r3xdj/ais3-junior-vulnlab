@@ -9,6 +9,10 @@ GATEWAY_URL = "http://web-gateway:5000"
 
 # ---- 公開行銷頁面 ----
 @app.route('/')
+def root():
+    return render_template('public/index.html')
+
+@app.route('/index')
 def index():
     return render_template('public/index.html')
 
@@ -152,10 +156,12 @@ def user_password():
 def robots_txt():
     return redirect('https://youtu.be/-so1CRzBB7s', code=302)
 
+"""
 # ---- redirect ----
 @app.route('/<path:path>.html')
 def html_redirect(path):
     return redirect(f'/{path}', code=301)
+"""
 
 # ---- 403 / 404 ----
 @app.errorhandler(404)
