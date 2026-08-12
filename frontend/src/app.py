@@ -1,6 +1,7 @@
 from flask import Flask, render_template, redirect, request, jsonify, Response
 from decorators import require_login_page, require_admin_page, redirect_if_logged_in
 import urllib
+import urllib.request
 
 app = Flask(__name__)
 
@@ -82,9 +83,7 @@ def register_page():
 # ---- 登入後導流(前端路由層,只影響 UX,不是安全邊界)----
 @app.route('/panel')
 def panel():
-    return render_template('panel_redirect.html')  # 頁面內 JS 打 /api/me 決定導去哪
-
-from decorators import require_login_page, require_admin_page
+    return render_template('panel_redirect.html')
 
 # ---- Admin 頁面殼 ----
 @app.route('/admin')
