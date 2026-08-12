@@ -24,19 +24,19 @@ def get_materials():
     return jsonify([
         {
             "name": "Web Security 基礎",
-            "file": "web01.pdf",
+            "file": "web_security.pdf",
         },
         {
             "name": "傑鋒的男友教戰手冊",
-            "file": "php01.pdf",
+            "file": "boyfriend_manual.pdf",
         },
         {
             "name": "Pwn Challenge Source Code",
-            "file": "pwn_wp01.zip",
+            "file": "pwn_source.pdf",
         },
         {
             "name": "我好電：紅隊演練實習生經驗分享",
-            "file": "redteam01.pdf",
+            "file": "red_team_intern.pdf",
         }
     ])
 

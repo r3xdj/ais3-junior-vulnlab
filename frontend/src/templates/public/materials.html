@@ -1,93 +1,410 @@
 {% extends "base_app.html" %}
 
-{% block content %}
-<div class="container py-4">
-    <h1>教材下載區</h1>
+{% block title %}教材中心{% endblock %}
 
-    <div id="materials-list">
-        <p>載入教材中...</p>
+{% block content %}
+
+<style>
+    .materials-header {
+        background: linear-gradient(
+            135deg,
+            #f8f9fa 0%,
+            #ffffff 100%
+        );
+        border: 1px solid #e9ecef;
+        border-radius: 16px;
+        padding: 35px;
+        margin-bottom: 30px;
+    }
+
+    .materials-icon {
+        width: 58px;
+        height: 58px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        background: #e7f1ff;
+        color: #0d6efd;
+        font-size: 1.6rem;
+        margin-bottom: 18px;
+    }
+
+    .materials-header h1 {
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: #212529;
+    }
+
+    .materials-header p {
+        color: #6c757d;
+        margin-bottom: 0;
+    }
+
+    .materials-panel {
+        background: #ffffff;
+        border: 1px solid #e9ecef;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 0.125rem 0.35rem rgba(0, 0, 0, 0.05);
+    }
+
+    .materials-panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 24px;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .materials-panel-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+        color: #212529;
+    }
+
+    .materials-panel-title i {
+        color: #0d6efd;
+    }
+
+    .materials-count {
+        font-size: 0.85rem;
+        color: #6c757d;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 999px;
+        padding: 5px 12px;
+    }
+
+    #materials-list {
+        padding: 24px;
+    }
+
+    .material-item {
+        height: 100%;
+        padding: 24px;
+        border: 1px solid #e9ecef;
+        border-radius: 14px;
+        background: #fff;
+
+        transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease,
+            border-color 0.2s ease;
+    }
+
+    .material-item:hover {
+        transform: translateY(-4px);
+        border-color: #b6d4fe;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08);
+    }
+
+    .material-file-icon {
+        width: 50px;
+        height: 50px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        background: #e7f1ff;
+        color: #0d6efd;
+
+        border-radius: 12px;
+
+        font-size: 1.35rem;
+        margin-bottom: 18px;
+    }
+
+    .material-item h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #212529;
+        margin-bottom: 7px;
+    }
+
+    .material-filename {
+        color: #6c757d;
+        font-size: 0.85rem;
+        margin-bottom: 20px;
+
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .material-read-btn {
+        width: 100%;
+        font-weight: 500;
+    }
+
+    .materials-loading,
+    .materials-empty,
+    .materials-error {
+        text-align: center;
+        padding: 55px 20px;
+        color: #6c757d;
+    }
+
+    .materials-loading i,
+    .materials-empty i,
+    .materials-error i {
+        display: block;
+        font-size: 2rem;
+        margin-bottom: 12px;
+    }
+</style>
+
+
+<div class="materials-header">
+
+    <div class="materials-icon">
+        <i class="bi bi-book"></i>
     </div>
+
+    <h1>教材中心</h1>
+
+    <p>
+        查看 NovaCore 提供的資安學習教材與技術文件。
+        選擇教材後即可開啟閱讀。
+    </p>
+
 </div>
 
+
+<div class="materials-panel">
+
+    <div class="materials-panel-header">
+
+        <div class="materials-panel-title">
+            <i class="bi bi-folder2-open"></i>
+            <span>教材資源</span>
+        </div>
+
+        <span
+            id="material-count"
+            class="materials-count"
+        >
+            載入中...
+        </span>
+
+    </div>
+
+
+    <div id="materials-list">
+
+        <div class="materials-loading">
+
+            <i class="bi bi-arrow-repeat"></i>
+
+            <div>
+                載入教材中...
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
 <script>
+
 async function loadMaterials() {
-    const container = document.getElementById("materials-list");
+
+    const container =
+        document.getElementById("materials-list");
+
+    const count =
+        document.getElementById("material-count");
 
     try {
-        const response = await fetch("/api/materials");
+
+        const response =
+            await fetch("/api/materials");
 
         if (!response.ok) {
-            throw new Error("HTTP " + response.status);
+            throw new Error(
+                "HTTP " + response.status
+            );
         }
 
-        const materials = await response.json();
+        const materials =
+            await response.json();
+
+        count.textContent =
+            `${materials.length} 份教材`;
 
         if (materials.length === 0) {
-            container.innerHTML = "<p>目前沒有教材。</p>";
+
+            container.innerHTML = `
+                <div class="materials-empty">
+                    <i class="bi bi-folder-x"></i>
+                    <div>目前沒有可用教材。</div>
+                </div>
+            `;
+
             return;
         }
 
-        container.innerHTML = "";
+        container.innerHTML = `
+            <div class="row g-4" id="materials-grid"></div>
+        `;
+
+        const grid =
+            document.getElementById("materials-grid");
 
         materials.forEach(material => {
-            const item = document.createElement("div");
 
-            item.className = "material-item mb-3";
+            const col =
+                document.createElement("div");
 
-            const title = document.createElement("h3");
-            title.textContent = material.name;
+            col.className =
+                "col-md-6 col-lg-4";
 
-            const button = document.createElement("button");
-            button.textContent = "閱讀教材";
-            button.className = "btn btn-primary";
+            const item =
+                document.createElement("div");
 
-            button.addEventListener("click", () => {
-                readMaterial(material.file);
-            });
+            item.className =
+                "material-item";
 
+            const icon =
+                document.createElement("div");
+
+            icon.className =
+                "material-file-icon";
+
+            icon.innerHTML =
+                '<i class="bi bi-file-earmark-pdf-fill"></i>';
+
+            const title =
+                document.createElement("h3");
+
+            title.textContent =
+                material.name;
+
+            const filename =
+                document.createElement("div");
+
+            filename.className =
+                "material-filename";
+
+            filename.textContent =
+                material.file;
+
+            const button =
+                document.createElement("button");
+
+            button.type =
+                "button";
+
+            button.className =
+                "btn btn-primary material-read-btn";
+
+            button.innerHTML =
+                '<i class="bi bi-book me-1"></i>閱讀教材';
+
+            button.addEventListener(
+                "click",
+                () => readMaterial(material.file)
+            );
+
+            item.appendChild(icon);
             item.appendChild(title);
+            item.appendChild(filename);
             item.appendChild(button);
 
-            container.appendChild(item);
+            col.appendChild(item);
+
+            grid.appendChild(col);
+
         });
 
     } catch (error) {
-        console.error("Failed to load materials:", error);
-        container.innerHTML = "<p>無法取得教材列表。</p>";
+
+        console.error(
+            "Failed to load materials:",
+            error
+        );
+
+        count.textContent =
+            "載入失敗";
+
+        container.innerHTML = `
+            <div class="materials-error">
+                <i class="bi bi-exclamation-triangle"></i>
+                <div>無法取得教材列表。</div>
+            </div>
+        `;
     }
 }
 
 
 async function readMaterial(filename) {
-    try {
-        const body = new URLSearchParams();
-        body.append("file", filename);
 
-        const response = await fetch("/api/materials/read", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            body: body.toString()
-        });
+    try {
+
+        const body =
+            new URLSearchParams();
+
+        body.append(
+            "file",
+            filename
+        );
+
+        const response =
+            await fetch(
+                "/api/materials/read",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/x-www-form-urlencoded"
+                    },
+
+                    body:
+                        body.toString()
+                }
+            );
 
         if (!response.ok) {
-            throw new Error("HTTP " + response.status);
+            throw new Error(
+                "HTTP " + response.status
+            );
         }
 
-        const blob = await response.blob();
+        const blob =
+            await response.blob();
 
-        const url = URL.createObjectURL(blob);
+        const url =
+            URL.createObjectURL(blob);
 
-        window.open(url, "_blank");
+        window.open(
+            url,
+            "_blank"
+        );
 
     } catch (error) {
-        console.error("Failed to read material:", error);
+
+        console.error(
+            "Failed to read material:",
+            error
+        );
+
         alert("教材讀取失敗");
     }
 }
 
 
 loadMaterials();
+
 </script>
+
 {% endblock %}
