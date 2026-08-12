@@ -144,7 +144,7 @@ ais3-junior-vulnlab/
 ## 啟動
 
 ```bash
-docker compose up -d --build
+./run.sh -d --build
 ```
 
 然後訪問 http://localhost:8080
