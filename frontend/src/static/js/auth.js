@@ -14,7 +14,17 @@ document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
         if (errorBox) errorBox.textContent = data.error || '登入失敗';
         return;
     }
-    window.location.href = '/panel';
+
+    const params = new URLSearchParams(window.location.search);
+    const next = params.get('next');
+
+    if (next) {
+        window.location.href = next;
+    }
+    else {
+        window.location.href = '/panel'
+    }
+
 });
 
 document.getElementById('registerForm')?.addEventListener('submit', async (e) => {

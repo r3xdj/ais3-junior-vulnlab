@@ -1,9 +1,28 @@
-{% extends "base_public.html" %}
-{% block title %}403 Forbidden{% endblock %}
-{% block content %}
-<div class="container text-center py-5">
-    <h1 class="display-4">403</h1>
-    <p class="text-muted">您沒有權限存取此頁面。</p>
-	<a href="javascript:history.back()" class="btn btn-secondary">返回上一頁</a>
-</div>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>403 Forbidden</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+</head>
+
+<body class="bg-light">
+    <div class="container text-center py-5">
+        <h1 class="display-4 fw-bold">403</h1>
+        <h2 class="mb-3">Forbidden</h2>
+
+        <p class="text-muted">
+            您沒有權限存取此頁面。
+        </p>
+
+        <a href="javascript:history.back()" class="btn btn-secondary">
+            返回上一頁
+        </a>
+    </div>
+</body>
+</html>

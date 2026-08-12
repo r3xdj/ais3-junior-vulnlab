@@ -36,6 +36,28 @@ def redirect_if_logged_in(f):
                 jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
                 return redirect('/panel')
             except jwt.InvalidTokenError:
-                pass  # token 無效,當作未登入,繼續往下走
+                pass
+        return f(*args, **kwargs)
+    return wrapper
+
+def redirect_if_admin(f):
+    @wraps(f)
+    @require_login_page
+    def wrapper(*args, **kwargs):
+        path = request.path
+        admin_path = None
+
+        if g.user.get('role') == 'admin':
+            if path == '/user':
+                admin_path = '/admin'
+            elif path.startswith('/user/'):
+                admin_path = '/admin' + path[len('/user'):]
+
+        if admin_path is not None:
+            query = request.query_string.decode('utf-8')
+            if query:
+                admin_path += '?' + query
+            return redirect(admin_path)
+        
         return f(*args, **kwargs)
     return wrapper

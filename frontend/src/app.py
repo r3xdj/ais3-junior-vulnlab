@@ -1,5 +1,4 @@
-from flask import Flask, render_template, redirect, request, Response
-import urllib.request
+from flask import Flask, render_template, redirect, request, jsonify, Response
 from decorators import require_login_page, require_admin_page, redirect_if_logged_in
 
 app = Flask(__name__)
@@ -87,6 +86,11 @@ def panel():
 from decorators import require_login_page, require_admin_page
 
 # ---- Admin 頁面殼 ----
+@app.route('/admin')
+@require_admin_page
+def admin():
+    return redirect('/admin/dashboard')
+
 @app.route('/admin/dashboard')
 @require_admin_page
 def admin_dashboard():
@@ -117,7 +121,12 @@ def admin_activity():
 def admin_password():
     return render_template('admin/password.html')
 
-# ---- User 頁面殼,一般登入即可(admin 也能用,前面討論過)----
+# ---- User 頁面殼 ----
+@app.route('/user')
+@require_login_page
+def user():
+    return redirect('/user/dashboard')
+
 @app.route('/user/dashboard')
 @require_login_page
 def user_dashboard():
@@ -142,6 +151,20 @@ def user_password():
 @app.route('/robots.txt')
 def robots_txt():
     return redirect('https://youtu.be/-so1CRzBB7s', code=302)
+
+# ---- 403 / 404 ----
+@app.errorhandler(404)
+def page_not_found(error):
+    if request.path.startswith('/api/'):
+        return jsonify({
+            'error': 'Not Found'
+        }), 404
+
+    return render_template('errors/404.html'), 404
+
+@app.errorhandler(403)
+def forbidden(error):
+    return render_template('errors/403.html'), 403
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=3000)
