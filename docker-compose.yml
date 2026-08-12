@@ -67,6 +67,8 @@ services:
 
   celery-worker:
     build: ./celery-worker
+    restart: unless-stopped
+    command: celery -A ais3_tasks worker --loglevel=INFO
     environment:
       REDIS_HOST: redis
       REDIS_PORT: 6379
