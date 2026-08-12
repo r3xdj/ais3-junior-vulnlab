@@ -2,6 +2,13 @@
 
 {% block title %}教材中心{% endblock %}
 
+{% block admin_tabs %}
+{% set current_path = request.path.rstrip('/') %}
+<a href="/admin/dashboard" class="nav-link {{ 'active fw-bold' if current_path == '/admin/dashboard' else '' }}">Dashboard</a>
+<a href="/admin/reports" class="nav-link {{ 'active fw-bold' if current_path == '/admin/reports' else '' }}">Reports</a>
+<a href="/admin/manage-users" class="nav-link {{ 'active fw-bold' if current_path == '/admin/manage-users' else '' }}">Users</a>
+{% endblock %}
+
 {% block content %}
 {% include "_partials/materials_content.html" %}
 {% endblock %}
