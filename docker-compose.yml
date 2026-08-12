@@ -10,6 +10,7 @@ services:
       - "2222:22"
     networks:
       - public_net
+      - internal_net
     depends_on:
       - web-gateway
       - frontend
