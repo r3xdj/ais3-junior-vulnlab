@@ -11,14 +11,20 @@ RUN sed -i 's/\r//' /usr/local/apache2/cgi-bin/debug.sh \
     && chmod +x /usr/local/apache2/cgi-bin/debug.sh \
     && chmod +x /usr/local/apache2/cgi-bin/test-cgi.sh
 
-# 安裝 SSH server
+# 安裝 SSH server, vim, sudo
 RUN sed -i 's|deb.debian.org|archive.debian.org|g' /etc/apt/sources.list \
     && sed -i 's|security.debian.org|archive.debian.org|g' /etc/apt/sources.list \
     && apt-get update -o Acquire::Check-Valid-Until=false \
-    && apt-get install -y --no-install-recommends openssh-server \
+    && apt-get install -y --no-install-recommends openssh-server sudo vim \
     && rm -rf /var/lib/apt/lists/* \
     && mkdir -p /var/run/sshd \
     && useradd -m -s /bin/bash opadmin
+
+RUN printf '%s\n' \
+    'opadmin ALL=(root) NOPASSWD: /usr/bin/vim' \
+    > /etc/sudoers.d/opadmin \
+    && chmod 440 /etc/sudoers.d/opadmin \
+    && visudo -cf /etc/sudoers.d/opadmin
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

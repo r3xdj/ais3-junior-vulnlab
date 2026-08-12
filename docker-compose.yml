@@ -19,6 +19,10 @@ services:
         source: ./flags/final_flag.txt
         target: /root/final_flag.txt
         read_only: true
+      - type: bind
+        source: ./flags/apache_flag.txt
+        target: /flag.txt
+        read_only: false
 
   postgres:
     build: ./datastores/postgres
