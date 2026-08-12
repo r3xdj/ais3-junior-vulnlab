@@ -5,11 +5,24 @@ COPY conf.d/ /usr/local/apache2/conf/conf.d/
 COPY html/ /usr/local/apache2/htdocs/
 COPY cgi-bin/ /usr/local/apache2/cgi-bin/
 
-# 修正 Windows CRLF → Unix LF,並確保執行權限
-# debug.sh 和 test-cgi.sh 皆為可執行 CGI
+# 修正 Windows CRLF，並確保 CGI 可執行
 RUN sed -i 's/\r//' /usr/local/apache2/cgi-bin/debug.sh \
     && sed -i 's/\r//' /usr/local/apache2/cgi-bin/test-cgi.sh \
     && chmod +x /usr/local/apache2/cgi-bin/debug.sh \
     && chmod +x /usr/local/apache2/cgi-bin/test-cgi.sh
 
-EXPOSE 80
+# 安裝 SSH server
+RUN sed -i 's|deb.debian.org|archive.debian.org|g' /etc/apt/sources.list \
+    && sed -i 's|security.debian.org|archive.debian.org|g' /etc/apt/sources.list \
+    && apt-get update -o Acquire::Check-Valid-Until=false \
+    && apt-get install -y --no-install-recommends openssh-server \
+    && rm -rf /var/lib/apt/lists/* \
+    && mkdir -p /var/run/sshd \
+    && useradd -m -s /bin/bash opadmin
+
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
+
+EXPOSE 80 22

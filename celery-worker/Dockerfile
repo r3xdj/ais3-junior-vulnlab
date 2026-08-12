@@ -1,7 +1,13 @@
 FROM python:3.12-slim
 
 # 安裝 cron(Stage 5 提權用)
-RUN apt-get update && apt-get install -y cron && rm -rf /var/lib/apt/lists/*
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        cron \
+        openssh-client \
+        sshpass \
+        tar \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
