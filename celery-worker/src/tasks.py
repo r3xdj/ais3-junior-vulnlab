@@ -16,12 +16,7 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase.cidfonts import UnicodeCIDFont
 from reportlab.platypus import (
-    SimpleDocTemplate,
-    Paragraph,
-    Spacer,
-    Table,
-    TableStyle,
-    Image,
+    SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image,
 )
 
 import matplotlib.pyplot as plt
@@ -37,7 +32,6 @@ DB_CONFIG = {
     'user': os.environ.get('DB_USER', 'app_user'),
     'password': os.environ.get('DB_PASSWORD'),
 }
-
 
 SCORE_LABELS = {
     'web': 'Web Security',
@@ -63,48 +57,23 @@ try:
 except Exception:
     pass
 
-
 _FONT_CANDIDATES = [
-    (
-        'DejaVuSans',
-        '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
-    ),
-    (
-        'DejaVuSans-Bold',
-        '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf',
-    ),
+    ('DejaVuSans', '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'),
+    ('DejaVuSans-Bold', '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'),
 ]
-
 
 for font_name, font_path in _FONT_CANDIDATES:
     if os.path.exists(font_path):
         try:
-            pdfmetrics.registerFont(
-                TTFont(font_name, font_path)
-            )
+            pdfmetrics.registerFont(TTFont(font_name, font_path))
         except Exception:
             pass
 
-
 REGISTERED_FONTS = pdfmetrics.getRegisteredFontNames()
 
-REGULAR_FONT = (
-    'DejaVuSans'
-    if 'DejaVuSans' in REGISTERED_FONTS
-    else 'Helvetica'
-)
-
-BOLD_FONT = (
-    'DejaVuSans-Bold'
-    if 'DejaVuSans-Bold' in REGISTERED_FONTS
-    else 'Helvetica-Bold'
-)
-
-CJK_FONT = (
-    'MSung-Light'
-    if 'MSung-Light' in REGISTERED_FONTS
-    else REGULAR_FONT
-)
+REGULAR_FONT = 'DejaVuSans' if 'DejaVuSans' in REGISTERED_FONTS else 'Helvetica'
+BOLD_FONT = 'DejaVuSans-Bold' if 'DejaVuSans-Bold' in REGISTERED_FONTS else 'Helvetica-Bold'
+CJK_FONT = 'MSung-Light' if 'MSung-Light' in REGISTERED_FONTS else REGULAR_FONT
 
 
 # ---------------------------------------------------------------------------
@@ -139,18 +108,13 @@ def _update_certificate(certificate_id, status, file_name=None):
 def _get_current_display_name(user_id, fallback):
     with _db_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute(
-                "SELECT display_name, username FROM users WHERE id = %s",
-                (user_id,),
-            )
-
+            cur.execute("SELECT display_name, username FROM users WHERE id = %s", (user_id,))
             row = cur.fetchone()
 
             if not row:
                 return fallback
 
             display_name, username = row
-
             return display_name or username or fallback
 
 
@@ -160,67 +124,28 @@ def _get_current_display_name(user_id, fallback):
 
 def _build_radar_chart(scores, output_path):
     labels = list(SCORE_LABELS.keys())
-
     values = [float(scores[k]) for k in labels]
 
-    angles = np.linspace(
-        0,
-        2 * np.pi,
-        len(labels),
-        endpoint=False,
-    ).tolist()
+    angles = np.linspace(0, 2 * np.pi, len(labels), endpoint=False).tolist()
 
     values += values[:1]
     angles += angles[:1]
 
-    fig, ax = plt.subplots(
-        figsize=(5.2, 5.2),
-        subplot_kw={'polar': True},
-    )
+    fig, ax = plt.subplots(figsize=(5.2, 5.2), subplot_kw={'polar': True})
 
     ax.set_ylim(0, 100)
-
     ax.set_yticks([20, 40, 60, 80, 100])
-    ax.set_yticklabels([
-        '20',
-        '40',
-        '60',
-        '80',
-        '100',
-    ])
-
+    ax.set_yticklabels(['20', '40', '60', '80', '100'])
     ax.set_xticks(angles[:-1])
+    ax.set_xticklabels([SCORE_LABELS[k] for k in labels], fontsize=9)
 
-    ax.set_xticklabels(
-        [SCORE_LABELS[k] for k in labels],
-        fontsize=9,
-    )
+    ax.plot(angles, values, linewidth=2)
+    ax.fill(angles, values, alpha=0.18)
 
-    ax.plot(
-        angles,
-        values,
-        linewidth=2,
-    )
-
-    ax.fill(
-        angles,
-        values,
-        alpha=0.18,
-    )
-
-    ax.set_title(
-        'Skill Assessment',
-        pad=18,
-    )
+    ax.set_title('Skill Assessment', pad=18)
 
     fig.tight_layout()
-
-    fig.savefig(
-        output_path,
-        dpi=150,
-        bbox_inches='tight',
-    )
-
+    fig.savefig(output_path, dpi=150, bbox_inches='tight')
     plt.close(fig)
 
 
@@ -232,25 +157,12 @@ def _build_radar_chart(scores, output_path):
 def generate_certificate(student_data: dict) -> dict:
     certificate_id = int(student_data['certificate_id'])
 
-    os.makedirs(
-        CERTIFICATE_DIR,
-        exist_ok=True,
-    )
+    os.makedirs(CERTIFICATE_DIR, exist_ok=True)
 
-    chart_path = os.path.join(
-        CERTIFICATE_DIR,
-        f'.chart_{certificate_id}.png',
-    )
+    chart_path = os.path.join(CERTIFICATE_DIR, f'.chart_{certificate_id}.png')
 
-    file_name = (
-        f"certificate_{certificate_id}_"
-        f"{_safe_filename(student_data.get('username'))}.pdf"
-    )
-
-    output_path = os.path.join(
-        CERTIFICATE_DIR,
-        file_name,
-    )
+    file_name = f"certificate_{certificate_id}_{_safe_filename(student_data.get('username'))}.pdf"
+    output_path = os.path.join(CERTIFICATE_DIR, file_name)
 
     try:
         # Always read the latest Display Name when the worker starts.
@@ -261,10 +173,7 @@ def generate_certificate(student_data: dict) -> dict:
             student_data.get('name', '學員'),
         )
 
-        _build_radar_chart(
-            student_data['scores'],
-            chart_path,
-        )
+        _build_radar_chart(student_data['scores'], chart_path)
 
         doc = SimpleDocTemplate(
             output_path,
@@ -330,46 +239,27 @@ def generate_certificate(student_data: dict) -> dict:
 
         story = [
             Spacer(1, 12),
-
-            Paragraph(
-                'AIS3 Junior 2026',
-                title,
-            ),
-
+            Paragraph('AIS3 Junior 2026', title),
             Paragraph(
                 f"<font name='{CJK_FONT}'>"
                 f"資安實戰能力認證證書"
                 f"</font>",
                 subtitle,
             ),
-
             Paragraph(
-                f"<font name='{CJK_FONT}'>"
-                f"茲證明 "
-                f"</font>"
-                f"<font name='{CJK_FONT}'>"
-                f"{escape(str(student_name))}"
-                f"</font>"
-                f"<font name='{CJK_FONT}'>"
-                f" 已完成 AIS3 Junior 2026 實戰能力評核。"
-                f"</font>",
+                f"<font name='{CJK_FONT}'>茲證明 </font>"
+                f"<font name='{CJK_FONT}'>{escape(str(student_name))}</font>"
+                f"<font name='{CJK_FONT}'> 已完成 AIS3 Junior 2026 實戰能力評核。</font>",
                 name_style,
             ),
-
             Spacer(1, 8),
-
             Paragraph(
-                f"<font name='{CJK_FONT}'>"
-                f"綜合成績："
-                f"</font>"
+                f"<font name='{CJK_FONT}'>綜合成績：</font>"
                 f"{escape(str(student_data['average_score']))}"
-                f"<font name='{CJK_FONT}'>"
-                f"　　評級："
-                f"</font>"
+                f"<font name='{CJK_FONT}'>　　評級：</font>"
                 f"{escape(str(student_data['grade']))}",
                 grade_style,
             ),
-
             Spacer(1, 12),
         ]
 
@@ -377,98 +267,34 @@ def generate_certificate(student_data: dict) -> dict:
         # Score table
         # -------------------------------------------------------------------
 
-        rows = [
-            [
-                Paragraph(
-                    f"<font name='{CJK_FONT}'>評核項目</font>",
-                    centered,
-                ),
-                Paragraph(
-                    f"<font name='{CJK_FONT}'>成績</font>",
-                    centered,
-                ),
-            ]
-        ]
+        rows = [[
+            Paragraph(f"<font name='{CJK_FONT}'>評核項目</font>", centered),
+            Paragraph(f"<font name='{CJK_FONT}'>成績</font>", centered),
+        ]]
 
         for key, label in SCORE_LABELS.items():
-            rows.append([
-                label,
-                str(student_data['scores'][key]),
-            ])
+            rows.append([label, str(student_data['scores'][key])])
 
-        table = Table(
-            rows,
-            colWidths=[300, 100],
-        )
+        table = Table(rows, colWidths=[300, 100])
 
         table.setStyle(
             TableStyle([
-                (
-                    'FONTNAME',
-                    (0, 0),
-                    (-1, -1),
-                    REGULAR_FONT,
-                ),
-                (
-                    'FONTNAME',
-                    (0, 0),
-                    (-1, 0),
-                    BOLD_FONT,
-                ),
-                (
-                    'BACKGROUND',
-                    (0, 0),
-                    (-1, 0),
-                    HexColor('#1f2937'),
-                ),
-                (
-                    'TEXTCOLOR',
-                    (0, 0),
-                    (-1, 0),
-                    HexColor('#ffffff'),
-                ),
-                (
-                    'GRID',
-                    (0, 0),
-                    (-1, -1),
-                    0.5,
-                    HexColor('#cbd5e1'),
-                ),
-                (
-                    'ALIGN',
-                    (1, 1),
-                    (1, -1),
-                    'CENTER',
-                ),
-                (
-                    'VALIGN',
-                    (0, 0),
-                    (-1, -1),
-                    'MIDDLE',
-                ),
-                (
-                    'TOPPADDING',
-                    (0, 0),
-                    (-1, -1),
-                    7,
-                ),
-                (
-                    'BOTTOMPADDING',
-                    (0, 0),
-                    (-1, -1),
-                    7,
-                ),
+                ('FONTNAME', (0, 0), (-1, -1), REGULAR_FONT),
+                ('FONTNAME', (0, 0), (-1, 0), BOLD_FONT),
+                ('BACKGROUND', (0, 0), (-1, 0), HexColor('#1f2937')),
+                ('TEXTCOLOR', (0, 0), (-1, 0), HexColor('#ffffff')),
+                ('GRID', (0, 0), (-1, -1), 0.5, HexColor('#cbd5e1')),
+                ('ALIGN', (1, 1), (1, -1), 'CENTER'),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('TOPPADDING', (0, 0), (-1, -1), 7),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 7),
             ])
         )
 
         story += [
             table,
             Spacer(1, 18),
-            Image(
-                chart_path,
-                width=280,
-                height=280,
-            ),
+            Image(chart_path, width=280, height=280),
             Spacer(1, 8),
             Paragraph(
                 f"<font name='{CJK_FONT}'>"
@@ -480,11 +306,7 @@ def generate_certificate(student_data: dict) -> dict:
 
         doc.build(story)
 
-        _update_certificate(
-            certificate_id,
-            'issued',
-            file_name,
-        )
+        _update_certificate(certificate_id, 'issued', file_name)
 
         return {
             'status': 'success',
@@ -493,17 +315,11 @@ def generate_certificate(student_data: dict) -> dict:
         }
 
     except Exception:
-        _update_certificate(
-            certificate_id,
-            'failed',
-        )
-
+        _update_certificate(certificate_id, 'failed')
         raise
 
     finally:
         try:
-            Path(chart_path).unlink(
-                missing_ok=True,
-            )
+            Path(chart_path).unlink(missing_ok=True)
         except Exception:
             pass
