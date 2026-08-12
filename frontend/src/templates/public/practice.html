@@ -3,126 +3,231 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>實戰攻防訓練 - AIS3 Student Portal</title>
+    <title>常見資安領域與攻防類型 - AIS3 Student Portal</title>
     <!-- 引入 Bootstrap 5 CSS 與 Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        .category-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.12) !important;
+        }
+        .icon-box {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+    </style>
 </head>
 <body class="bg-light">
 
     <!-- 頂部導覽列 -->
-    {% include "public/_navbar.html" %}
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="index.html">
+                <i class="bi bi-shield-lock-fill text-primary me-2"></i>AIS3 Student Portal
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="index.html">首頁</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="practice.html">實戰攻防</a></li>
+                    <li class="nav-item"><a class="nav-link" href="certification.html">榮譽認證</a></li>
+                    <li class="nav-item"><a class="nav-link" href="ta.html">頂尖助教</a></li>
+                    <li class="nav-item"><a class="nav-link" href="about.html">關於 AIS3</a></li>
+                    <li class="nav-item"><a class="nav-link" href="login.html">學員登入</a></li>
+                    <li class="nav-item ms-2">
+                        <a class="btn btn-primary text-white px-3" href="register.html">報名榮譽考試</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
     <!-- 主視覺 Header -->
     <header class="bg-dark text-white py-5 border-bottom border-primary border-4">
         <div class="container text-center my-3">
-            <h1 class="display-5 fw-bold"><i class="bi bi-cpu text-primary me-2"></i>資安實戰攻防核心模組</h1>
-            <p class="lead text-white-50">模擬真實企業微服務架構，培養具備全方位滲透測試與漏洞分析能力之資安人才</p>
+            <h1 class="display-5 fw-bold"><i class="bi bi-shield-check text-primary me-2"></i>常見資安領域與攻防類型</h1>
+            <p class="lead text-muted">掌握 CTF 競賽與資安實踐中的六大核心技術範疇</p>
         </div>
     </header>
 
-    <!-- 攻防訓練四大模組 -->
+    <!-- 領域介紹卡片區塊 -->
     <div class="container py-5">
-        <div class="text-center mb-5">
-            <h2 class="fw-bold">階梯式攻防實踐地圖</h2>
-            <p class="text-muted">從外網資產偵查、Web 邏輯漏洞利用，一路滲透至內網微服務與系統提權</p>
-        </div>
-
         <div class="row g-4">
-            <!-- 模組 1 -->
-            <div class="col-md-6">
-                <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body p-4">
-                        <div class="d-flex align-items-center mb-3">
-                            <div class="bg-primary text-white rounded-circle p-3 me-3">
-                                <i class="bi bi-search fs-3"></i>
-                            </div>
-                            <div>
-                                <h4 class="card-title fw-bold mb-0">Phase 1: 邊界偵查與資產外洩</h4>
-                                <span class="badge bg-secondary">Reconnaissance & Web</span>
-                            </div>
+
+            <!-- 1. Web 安全 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm border-0 p-3 category-card">
+                    <div class="card-body">
+                        <div class="icon-box bg-primary bg-opacity-10 text-primary mb-3">
+                            <i class="bi bi-globe"></i>
                         </div>
-                        <p class="card-text text-muted">
-                            學習如何發現企業邊界入口的隱藏資產與已知漏洞。包含 Apache CVE 漏洞利用、敏感檔案（如 <code>.git</code> 版本控制與環境變數 <code>.env</code>）外洩讀取與源碼分析。
-                        </p>
+                        <h4 class="card-title fw-bold">Web 安全 (Web Security)</h4>
+                        <p class="text-muted small">針對網站應用程式與 API 介面進行漏洞挖掘與利用。</p>
+                        <hr>
+                        <ul class="list-unstyled text-secondary lh-lg mb-0">
+                            <li><i class="bi bi-check2-circle text-primary me-2"></i>SQL / NoSQL 注入攻擊</li>
+                            <li><i class="bi bi-check2-circle text-primary me-2"></i>跨站腳本漏洞 (XSS)</li>
+                            <li><i class="bi bi-check2-circle text-primary me-2"></i>伺服器端請求偽造 (SSRF)</li>
+                            <li><i class="bi bi-check2-circle text-primary me-2"></i>身分驗證與 Session 繞過</li>
+                        </ul>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 pt-0">
+                        <span class="badge bg-primary bg-opacity-10 text-primary">Web Attack</span>
+                        <span class="badge bg-primary bg-opacity-10 text-primary">API Vulnerability</span>
                     </div>
                 </div>
             </div>
 
-            <!-- 模組 2 -->
-            <div class="col-md-6">
-                <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body p-4">
-                        <div class="d-flex align-items-center mb-3">
-                            <div class="bg-danger text-white rounded-circle p-3 me-3">
-                                <i class="bi bi-bug fs-3"></i>
-                            </div>
-                            <div>
-                                <h4 class="card-title fw-bold mb-0">Phase 2: Web 服務與身分驗證破壞</h4>
-                                <span class="badge bg-danger">Web Logic & Injection</span>
-                            </div>
+            <!-- 2. 逆向工程 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm border-0 p-3 category-card">
+                    <div class="card-body">
+                        <div class="icon-box bg-danger bg-opacity-10 text-danger mb-3">
+                            <i class="bi bi-code-slash"></i>
                         </div>
-                        <p class="card-text text-muted">
-                            深入探索後端 API 邏輯陷阱，包含 JWT Session 驗證繞過、手動字串拼接導致的 <strong>JSON Injection</strong> 權限提升，以及伺服器端請求偽造 (SSRF) 攻擊。
-                        </p>
+                        <h4 class="card-title fw-bold">逆向工程 (Reverse Engineering)</h4>
+                        <p class="text-muted small">分析已編譯的執行檔，逆向推導程式運作邏輯與演算法。</p>
+                        <hr>
+                        <ul class="list-unstyled text-secondary lh-lg mb-0">
+                            <li><i class="bi bi-check2-circle text-danger me-2"></i>組合語言與 CPU 暫存器分析</li>
+                            <li><i class="bi bi-check2-circle text-danger me-2"></i>反組譯工具（IDA Pro, Ghidra）</li>
+                            <li><i class="bi bi-check2-circle text-danger me-2"></i>反動態除錯與程式碼加殼解密</li>
+                            <li><i class="bi bi-check2-circle text-danger me-2"></i>保護機制與演算法逆向</li>
+                        </ul>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 pt-0">
+                        <span class="badge bg-danger bg-opacity-10 text-danger">Assembly</span>
+                        <span class="badge bg-danger bg-opacity-10 text-danger">Decompile</span>
                     </div>
                 </div>
             </div>
 
-            <!-- 模組 3 -->
-            <div class="col-md-6">
-                <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body p-4">
-                        <div class="d-flex align-items-center mb-3">
-                            <div class="bg-warning text-dark rounded-circle p-3 me-3">
-                                <i class="bi bi-diagram-3 fs-3"></i>
-                            </div>
-                            <div>
-                                <h4 class="card-title fw-bold mb-0">Phase 3: 內網橫向移動與微服務滲透</h4>
-                                <span class="badge bg-warning text-dark">Lateral Movement & Redis</span>
-                            </div>
+            <!-- 3. Pwn / 二進位漏洞利用 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm border-0 p-3 category-card">
+                    <div class="card-body">
+                        <div class="icon-box bg-warning bg-opacity-10 text-warning mb-3">
+                            <i class="bi bi-terminal"></i>
                         </div>
-                        <p class="card-text text-muted">
-                            穿透 <code>internal_net</code> 網路隔離層。利用 SSRF 結合 Gopher 協定對未授權 Redis 進行命令注入，探索 PostgreSQL 資料庫與背景 Celery 任務佇列。
-                        </p>
+                        <h4 class="card-title fw-bold">二進位漏洞利用 (Pwn)</h4>
+                        <p class="text-muted small">尋找作業系統或軟體底層記憶體漏洞以控制程式執行流程。</p>
+                        <hr>
+                        <ul class="list-unstyled text-secondary lh-lg mb-0">
+                            <li><i class="bi bi-check2-circle text-warning me-2"></i>緩衝區溢位 (Buffer Overflow)</li>
+                            <li><i class="bi bi-check2-circle text-warning me-2"></i>ROP (Return-Oriented Programming)</li>
+                            <li><i class="bi bi-check2-circle text-warning me-2"></i>堆疊與堆積漏洞利用 (Heap Exploitation)</li>
+                            <li><i class="bi bi-check2-circle text-warning me-2"></i>繞過記憶體保護機制 (DEP / ASLR)</li>
+                        </ul>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 pt-0">
+                        <span class="badge bg-warning bg-opacity-10 text-dark">Memory Exploit</span>
+                        <span class="badge bg-warning bg-opacity-10 text-dark">Shellcode</span>
                     </div>
                 </div>
             </div>
 
-            <!-- 模組 4 -->
-            <div class="col-md-6">
-                <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body p-4">
-                        <div class="d-flex align-items-center mb-3">
-                            <div class="bg-success text-white rounded-circle p-3 me-3">
-                                <i class="bi bi-terminal fs-3"></i>
-                            </div>
-                            <div>
-                                <h4 class="card-title fw-bold mb-0">Phase 4: 系統反序列化與權限提升</h4>
-                                <span class="badge bg-success">RCE & Privilege Escalation</span>
-                            </div>
+            <!-- 4. 密碼學 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm border-0 p-3 category-card">
+                    <div class="card-body">
+                        <div class="icon-box bg-success bg-opacity-10 text-success mb-3">
+                            <i class="bi bi-key"></i>
                         </div>
-                        <p class="card-text text-muted">
-                            實作 Python Pickle 序列化 RCE 取得容器 Shell，並利用 Linux 定時維護腳本（Cronjob / SUID / Tar 萬用字元漏洞）提權至 Root 取得終極 Flag。
-                        </p>
+                        <h4 class="card-title fw-bold">密碼學 (Cryptography)</h4>
+                        <p class="text-muted small">研究古典與現代加密演算法缺陷，進行金鑰破解與密文還原。</p>
+                        <hr>
+                        <ul class="list-unstyled text-secondary lh-lg mb-0">
+                            <li><i class="bi bi-check2-circle text-success me-2"></i>古典密碼學與替換密碼</li>
+                            <li><i class="bi bi-check2-circle text-success me-2"></i>對稱加密攻擊 (AES, DES, CBC Mode)</li>
+                            <li><i class="bi bi-check2-circle text-success me-2"></i>非對稱加密破解 (RSA, ECC)</li>
+                            <li><i class="bi bi-check2-circle text-success me-2"></i>雜湊碰撞與偽造攻擊 (Hash Collision)</li>
+                        </ul>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 pt-0">
+                        <span class="badge bg-success bg-opacity-10 text-success">Encryption</span>
+                        <span class="badge bg-success bg-opacity-10 text-success">RSA / AES</span>
                     </div>
                 </div>
             </div>
+
+            <!-- 5. 數位鑑識 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm border-0 p-3 category-card">
+                    <div class="card-body">
+                        <div class="icon-box bg-info bg-opacity-10 text-info mb-3">
+                            <i class="bi bi-search"></i>
+                        </div>
+                        <h4 class="card-title fw-bold">數位鑑識 (Digital Forensics)</h4>
+                        <p class="text-muted small">分析網路封包、記憶體鏡像與硬碟映像，還原事件經過與證據。</p>
+                        <hr>
+                        <ul class="list-unstyled text-secondary lh-lg mb-0">
+                            <li><i class="bi bi-check2-circle text-info me-2"></i>網路封包分析 (Wireshark / PCAP)</li>
+                            <li><i class="bi bi-check2-circle text-info me-2"></i>記憶體鑑識與分析 (Volatility)</li>
+                            <li><i class="bi bi-check2-circle text-info me-2"></i>檔案系統分析與隱寫術 (Steganography)</li>
+                            <li><i class="bi bi-check2-circle text-info me-2"></i>日誌檔分析與入侵追蹤</li>
+                        </ul>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 pt-0">
+                        <span class="badge bg-info bg-opacity-10 text-info">PCAP Analysis</span>
+                        <span class="badge bg-info bg-opacity-10 text-info">Forensics</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. 雜項與組合應用 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm border-0 p-3 category-card">
+                    <div class="card-body">
+                        <div class="icon-box bg-secondary bg-opacity-10 text-secondary mb-3">
+                            <i class="bi bi-box-seam"></i>
+                        </div>
+                        <h4 class="card-title fw-bold">雜項 (Miscellaneous / Misc)</h4>
+                        <p class="text-muted small">包含程式自動化、公開來源情報 (OSINT) 與跨領域綜合應用。</p>
+                        <hr>
+                        <ul class="list-unstyled text-secondary lh-lg mb-0">
+                            <li><i class="bi bi-check2-circle text-secondary me-2"></i>公開來源情報偵查 (OSINT)</li>
+                            <li><i class="bi bi-check2-circle text-secondary me-2"></i>自動化腳本寫作 (Python Scripting)</li>
+                            <li><i class="bi bi-check2-circle text-secondary me-2"></i>特殊編碼與資料格式解碼</li>
+                            <li><i class="bi bi-check2-circle text-secondary me-2"></i>硬體資安與無線電通訊攻擊</li>
+                        </ul>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 pt-0">
+                        <span class="badge bg-secondary bg-opacity-10 text-secondary">OSINT</span>
+                        <span class="badge bg-secondary bg-opacity-10 text-secondary">Automation</span>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
-        <!-- 練習行動呼籲 -->
+        <!-- 考試報名區塊 -->
         <div class="card bg-primary text-white border-0 shadow mt-5">
             <div class="card-body p-5 text-center">
-                <h3 class="fw-bold mb-3">準備好實測你的攻防實戰能力了嗎？</h3>
-                <p class="lead mb-4">報名 AIS3 榮譽考試，挑戰階梯式 Boot2Root 靶機題庫！</p>
-                <a href="/register" class="btn btn-light btn-lg fw-bold text-primary px-4 me-2">立即報名考試</a>
-                <a href="/" class="btn btn-outline-light btn-lg px-4">返回首頁</a>
+                <h3 class="fw-bold mb-3">準備好檢測你的資安技術儲備了嗎？</h3>
+                <p class="lead mb-4">報名「AIS3 榮譽考試」，透過豐富的模擬題庫驗證你在各資安領域的實務理解！</p>
+                <a href="register.html" class="btn btn-light btn-lg fw-bold text-primary px-4 me-2">立即報名考試</a>
+                <a href="index.html" class="btn btn-outline-light btn-lg px-4">返回首頁</a>
             </div>
         </div>
     </div>
 
     <!-- 頁尾 -->
-    {% include "public/_footer.html" %}
+    <footer class="bg-dark text-white text-center py-4">
+        <div class="container">
+            <p class="mb-0">© 2026 AIS3 Junior VulnLab. All Rights Reserved.</p>
+        </div>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
