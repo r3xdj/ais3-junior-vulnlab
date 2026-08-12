@@ -1,3 +1,34 @@
+async function loadDashboardStats() {
+    const totalUsers = document.getElementById('totalUsers');
+    const adminUsers = document.getElementById('adminUsers');
+
+    if (!totalUsers && !adminUsers) return;
+
+    try {
+        const res = await fetch(apiUrl('/api/admin/users'), {
+            credentials: 'include'
+        });
+
+        if (!res.ok) {
+            console.error('Failed to load users:', res.status);
+            return;
+        }
+
+        const users = await res.json();
+
+        if (totalUsers) {
+            totalUsers.textContent = users.length;
+        }
+
+        if (adminUsers) {
+            adminUsers.textContent =
+                users.filter(user => user.role === 'admin').length;
+        }
+    } catch (err) {
+        console.error('Failed to load dashboard stats:', err);
+    }
+}
+
 async function loadUsers() {
     const tbody = document.getElementById('usersTableBody');
     if (!tbody) return;
@@ -9,10 +40,6 @@ async function loadUsers() {
     }
 
     const users = await res.json();
-    const totalUsers = document.getElementById('totalUsers');
-    const adminUsers = document.getElementById('adminUsers');
-    if (totalUsers) totalUsers.textContent = users.length;
-    if (adminUsers) adminUsers.textContent = users.filter(u => u.role === 'admin').length;
 
     window.__users = users;
     tbody.innerHTML = users.map(u => {
@@ -126,6 +153,7 @@ document.addEventListener('click', async (e) => {
 });
 
 window.addEventListener('DOMContentLoaded', () => {
+    loadDashboardStats();
     loadUsers();
     document.getElementById('certificateForm')?.addEventListener('submit', submitCertificate);
 });
