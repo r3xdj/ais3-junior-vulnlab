@@ -1,9 +1,3 @@
-{% extends "base_app.html" %}
-
-{% block title %}教材中心{% endblock %}
-
-{% block content %}
-
 <style>
     .materials-header {
         background: linear-gradient(
@@ -167,7 +161,7 @@
     <h1>教材中心</h1>
 
     <p>
-        查看 NovaCore 提供的資安學習教材與技術文件。
+        查看 AIS3 提供的資安學習教材與技術文件。
         選擇教材後即可開啟閱讀。
     </p>
 
@@ -209,10 +203,6 @@
 
 </div>
 
-{% endblock %}
-
-
-{% block extra_js %}
 
 <script>
 
@@ -227,7 +217,7 @@ async function loadMaterials() {
     try {
 
         const response =
-            await fetch("/api/materials");
+            await fetch("/api/materials", { credentials: "include" });
 
         if (!response.ok) {
             throw new Error(
@@ -364,6 +354,8 @@ async function readMaterial(filename) {
                 {
                     method: "POST",
 
+                    credentials: "include",
+
                     headers: {
                         "Content-Type":
                             "application/x-www-form-urlencoded"
@@ -406,5 +398,3 @@ async function readMaterial(filename) {
 loadMaterials();
 
 </script>
-
-{% endblock %}

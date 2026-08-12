@@ -1,7 +1,7 @@
 import os
 
 from flask import Blueprint, jsonify, request, send_file
-from decorators import require_admin, require_login
+from decorators import require_login
 
 
 material_bp = Blueprint(
@@ -27,12 +27,12 @@ def get_materials():
             "file": "web_security.pdf",
         },
         {
-            "name": "傑鋒的男友教戰手冊",
+            "name": "傑鋒的男友教戰手冊：資安長不告訴你的祕密",
             "file": "boyfriend_manual.pdf",
         },
         {
-            "name": "Pwn Challenge Source Code",
-            "file": "pwn_source.pdf",
+            "name": "Pwn 入門",
+            "file": "pwn01.pdf",
         },
         {
             "name": "我好電：紅隊演練實習生經驗分享",
