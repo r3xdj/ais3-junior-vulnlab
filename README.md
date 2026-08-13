@@ -88,6 +88,7 @@ Stage 7  sudo -l 允許以 root 執行 vim         → opadmin 提權為 root
 - `docs/vulnerability-analysis.md` — 逐關漏洞成因與利用原理
 - `docs/flag-design.md` — 七關 flag 的位置、掛載方式與防跳關設計
 - `docs/deployment.md` — 部署、逐關驗證步驟與作者驗收表
+- `docs/remediation.md` — 七個漏洞各自的修補建議（root cause fix + 縱深防禦）
 
 ## 3. 主要服務
 
@@ -269,7 +270,8 @@ ais3-junior-vulnlab/
 ├── docs/
 │   ├── vulnerability-analysis.md
 │   ├── flag-design.md
-│   └── deployment.md
+│   ├── deployment.md
+│   └── remediation.md
 │
 └── writeup/
     ├── PoC/
