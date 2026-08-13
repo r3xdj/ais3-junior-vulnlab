@@ -1,4 +1,5 @@
 # ais3-junior-vulnlab
+> 暫時叫 AI 生成的，之後要重寫
 
 AIS3 Junior 2026 自製 CTF / Boot2Root 靶機。
 
