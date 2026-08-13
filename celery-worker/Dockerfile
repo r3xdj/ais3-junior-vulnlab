@@ -9,6 +9,7 @@ RUN apt-get update \
         tar \
         fonts-noto-cjk \
         fonts-dejavu \
+        procps \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
