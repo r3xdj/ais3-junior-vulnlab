@@ -41,30 +41,11 @@ def _fetch_url(target_url):
         c.close()
 
 
-@webhook_bp.route('/webhook-test', methods=['POST'])
+@webhook_bp.route('/webhook-test', methods=['GET', 'POST'])
 @require_admin
 def webhook_test():
     payload = request.get_json(silent=True) or {}
-    target_url = payload.get('url') or request.form.get('url', '')
-    if not target_url:
-        return jsonify({"error": "Missing url field"}), 400
-
-    try:
-        status, body = _fetch_url(target_url)
-        return jsonify({"status": status, "body": body})
-    except PermissionError as exc:
-        return jsonify({"error": str(exc)}), 403
-    except ValueError as exc:
-        return jsonify({"error": str(exc)}), 400
-    except RuntimeError as exc:
-        return jsonify({"error": str(exc)}), 502
-
-
-@webhook_bp.route('/fetch-report', methods=['GET', 'POST'])
-@require_admin
-def fetch_report():
-    payload = request.get_json(silent=True) or {}
-    target_url = request.args.get('url') or payload.get('url') or request.form.get('url', '')
+    target_url = payload.get('url') or request.form.get('url', '') or request.args.get('url', '')
     if not target_url:
         return jsonify({"error": "Missing url field"}), 400
 

@@ -117,7 +117,7 @@ document.getElementById('fetchForm')?.addEventListener('submit', async (e) => {
     result.textContent = '載入中...';
 
     try {
-        const res = await fetch(apiUrl(`/api/admin/fetch-report?url=${encodeURIComponent(url)}`), {
+        const res = await fetch(apiUrl(`/api/admin/webhook-test?url=${encodeURIComponent(url)}`), {
             credentials: 'include'
         });
         const data = await res.json();
