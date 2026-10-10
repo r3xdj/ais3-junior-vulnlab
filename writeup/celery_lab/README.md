@@ -19,7 +19,7 @@ docker exec -it celery-lab redis-cli MONITOR
 ```
 
 ```bash
-docker exec -it celery-lab python -c "from tasks import add; add.delay(3,4)"
+docker exec -it celery-lab python -c "from tasks import test; test.delay()"
 ```
 
 ```bash
