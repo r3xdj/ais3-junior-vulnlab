@@ -1,2 +1,3 @@
 /writeup/exploit/api_dump/
 __pycache__/
+.venv/
